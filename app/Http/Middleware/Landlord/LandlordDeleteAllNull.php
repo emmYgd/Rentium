@@ -1,26 +1,30 @@
 <?php
 
-namespace App\Http\Middleware\Landlord;
+namespace App\Http\Middleware\Vendor;
 
 use Illuminate\Http\Request;
 
 use Closure;
-use App\Models\Landlord;
+use App\Services\Traits\ModelAbstractions\Vendor\VendorAccessAbstraction;
 
-class LandlordDeleteAllNull
+final class VendorDeleteAllNull
 {
-	//use LandlordAccessAbstraction;
+	use VendorAccessAbstraction;
 
 	public function handle(Request $request, Closure $next)
 	{
-		$response = $next($request);
-		//delete all collections where unique_landlord_id and landlord_password == null;
+		//Before:
+		//delete all collections where unique_vendor_id and vendor_password == null;
         $deleteKeysValues = [
-            'unique_landlord_id' => null,
-            'landlord_password' => null
+            'unique_vendor_id' => 'null',
+            'vendor_password' => 'null'
         ];
-	
-      	Landlord::where($deleteKeysValues)->delete();
+
+		$this?->VendorDeleteAllNullService($deleteKeysValues);
+
+		//After:
+		//Pass to next stack:
+		$response = $next($request);
         return $response;
 	}
 	

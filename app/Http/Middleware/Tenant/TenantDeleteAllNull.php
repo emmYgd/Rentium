@@ -5,22 +5,26 @@ namespace App\Http\Middleware\Tenant;
 use Illuminate\Http\Request;
 
 use Closure;
-use App\Models\Tenant;
+use App\Services\Traits\ModelAbstractions\Tenant\TenantAccessAbstraction;
 
-class TenantDeleteAllNull
+final class TenantDeleteAllNull
 {
-	//use BuyerAccessAbstraction;
+	use TenantAccessAbstraction;
 
 	public function handle(Request $request, Closure $next)
 	{
-		$response = $next($request);
-		//delete all collections where unique_buyer_id and buyer_password == null;
+		//Before:
+		//delete all collections where unique_tenant_id and tenant_password == null;
         $deleteKeysValues = [
-            'unique_tenant_id' => null,
-            'tenant_password' => null
+            'unique_tenant_id' => 'null',
+            'tenant_password' => 'null'
         ];
-	
-      	Tenant::where($deleteKeysValues)->delete();
+
+		$this?->TenantDeleteAllNullService($deleteKeysValues);
+
+		//After:
+		//Pass to next stack:
+		$response = $next($request);
         return $response;
 	}
 	
