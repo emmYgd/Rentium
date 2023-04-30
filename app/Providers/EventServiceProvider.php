@@ -18,6 +18,32 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+
+                //bind app events to listeners:
+
+        //Register:
+        \App\Events\Tenant\TenantHasRegistered::class => [
+            \App\Listeners\Tenant\EmailTenantAboutVerification::class,
+            \App\Listeners\Tenant\EmailTenantAboutWelcome::class,
+            //others here...
+        ],
+
+        \App\Events\Landlord\LandlordHasRegistered::class => [
+            \App\Listeners\Landlord\EmailLandlordAboutVerification::class,
+            \App\Listeners\Landlord\EmailLandlordAboutWelcome::class,
+            //others here...
+        ],
+
+
+        //Password Reset:
+        \App\Events\Tenant\PassResetLinkWasFormed::class => [
+            \App\Listeners\Tenant\EmailTenantAboutReset::class,
+        ],
+
+        \App\Events\Landlord\PassResetLinkWasFormed::class => [
+            \App\Listeners\Landlord\EmailLandlordAboutReset::class,
+        ],
+
     ];
 
     /**

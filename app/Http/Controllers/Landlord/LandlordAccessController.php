@@ -8,25 +8,36 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 use App\Http\Validators\Landlord\LandlordAccessRequestRules;
-
 use App\Services\Interfaces\Landlord\LandlordAccessInterface;
 use App\Services\Traits\ModelAbstraction\Landlord\LandlordAccessAbstraction;
+
+use App\Services\Traits\ModelAbstraction\General\Landlord\EmailVerificationNotificationAbstraction;
+use App\Services\Traits\ModelAbstraction\General\Landlord\VerifyEmailAbstraction;
+use App\Services\Traits\ModelAbstraction\General\Landlord\PasswordResetLinkAbstraction;
+use App\Services\Traits\ModelAbstraction\General\Landlord\NewPasswordAbstraction;
+
 use App\Services\Traits\Utilities\ComputeUniqueIDService;
 use App\Services\Traits\Utilities\PassHashVerifyService;
+
 
 
 final class LandlordAccessController extends Controller implements LandlordAccessInterface
 {
     use LandlordAccessRequestRules;
     use LandlordAccessAbstraction;
-    use ComputeUniqueIDService;
-    use PassHashVerifyService;
-    
 
+    use EmailVerificationNotificationAbstraction;
+    use VerifyEmailAbstraction;
+    use PasswordResetLinkAbstraction;
+    use NewPasswordAbstraction;
+
+    use ComputeUniqueIDService;
+    use PassHashVerifyService;    
+    
     public function __construct()
     {
         //initialize Landlord Object:
-        //public $Landlord = new Landlord;
+        //private $Landlord = new Landlord;
     }
     
 
@@ -44,61 +55,77 @@ final class LandlordAccessController extends Controller implements LandlordAcces
             if($validator?->fails())
             {
                 //throw Exception:
-                throw new Exception("Invalid Input provided!");
+                throw new Exception("Invalid Input(s) provided!");
             }
 
             //pass the validated value to the Model Abstraction Service: 
-            $is_details_saved = $this?->LandlordRegisterService($request);
-
-            if(!$is_details_saved)
+            $detail_was_partially_saved = $this?->LandlordRegisterService($request);
+            if(!$detail_was_partially_saved)
             {
-                //delete the formerlly saved data:
-                /*$deleteKeysValues = ['buyer_email' => $request?->buyer_email];
-                $this?->LandlordDeleteSpecificService($deleteKeysValues);*/
-
-                throw new Exception("Your details could not be registered. Please try again!"); 
+                throw new Exception("Your detail could not be registered. Please try again!"); 
             }
 
             //since password can't be saved through mass assignment, so save specific:
-            $hashedPass = $this?->TransformPassService($request?->buyer_password);
-            //$this?->HashPassword($request?->password);
+            $hashedPass = $this?->CustomHashPassword($request?->landlord_password);
 
             //unique id can't be saved through mass assignment, so save specific:
             $uniqueID = $this?->genUniqueAlphaNumID();
 
             $queryKeysValues = [
-                'buyer_email' => $request?->buyer_email
+                'landlord_email' => $request?->landlord_email
             ];
 
             $newKeysValues = [ 
-                'buyer_password' => $hashedPass, 
-                'unique_buyer_id' => $uniqueID 
+                'landlord_password' => $hashedPass, 
+                'unique_landlord_id' => $uniqueID 
             ];
 
             $pass_id_were_saved = $this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
 
             if(!$pass_id_were_saved)
             {
-                //delete the formerlly saved data:
+                //delete the formerly saved data if password and id are not saved:
                 $deleteKeysValues = [
-                    'buyer_email' => $request?->buyer_email
+                    'landlord_email' => $request?->landlord_email
                 ];
-                $this?->LandlordDeleteSpecificService($deleteKeysValues);
+                $partially_saved_data_was_deleted = $this?->LandlordDeleteAllNullService($deleteKeysValues);
+    
+                if($partially_saved_data_was_deleted)
+                {
+                    //then throw new Exception:
+                    throw new Exception("Your details could not be registered. Please try again!"); 
+                } 
+                //else:
+                    //leave it to the middleware to Delete All null before each request
+            }
 
-                //then, throw exception: 
-                throw new Exception("Your details could not be registered. Please try again!"); 
+            //After all these, send the mail for landlord email verification:
+            $verify_link_was_sent = $this?->SendVerificationReqMail($request, 'landlord.verifications.verify', [
+                'verify' => $uniqueID, 
+                'answer' => 'done',
+            ]);
+            //if it wasn't successful:
+            if(!$verify_link_was_sent)
+            {
+                //delete all records of this landlord:
+                $deleteKeysValues = ['landlord_email' => $request?->landlord_email];
+                $this?->LandlordDeleteSpecificService($deleteKeysValues);
+                //throw Exception:
+                throw new Exception("Verification Request Mail wasn't sent successfully!");
             }
 
             $status = [
                 'code' => 1,
-                'serverStatus' => 'RegEntriesSaved!',
+                'serverStatus' => 'RegisterSuccess!',
+                'short_description' => 'E-mail Verification Link Sent. Please Verify your E-mail to continue!',
+                'verify_link' => $verify_link_was_sent
             ];
         }
         catch(Exception $ex)
         {
-            //warnings for sql repetititive inputs attempts in db
-            $duplicationWarning1 = "Integrity constraint violation";
-            $duplicationWarning2 = "SQLSTATE[23000]";
+            //warnings for sql repetititive input(s)s attempts in db
+            /*$duplicationWarning1 = "Integrity constraint violation";
+            $duplicationWarning2 = "SQLSTATE[23000]";*/
             $duplicationWarning = '1062 Duplicate entry';
 
             $status = [
@@ -108,10 +135,10 @@ final class LandlordAccessController extends Controller implements LandlordAcces
             ];
 
             $str_contains_first_warning = str_contains($status['short_description'], $duplicationWarning1);
-            $str_contains_second_warning = str_contains($status['short_description'], $duplicationWarning2);
-            $str_contains_third_warning = str_contains($status['short_description'], $duplicationWarning3);
+            //$str_contains_second_warning = str_contains($status['short_description'], $duplicationWarning2);
+            //$str_contains_third_warning = str_contains($status['short_description'], $duplicationWarning3);
             if( 
-                $str_contains_first_warning || $str_contains_second_warning || $str_contains_third_warning
+                $str_contains_first_warning //|| $str_contains_second_warning || $str_contains_third_warning
             )
             {
                 $status['warning'] = 'Either Your Email, Password or Phone Number have been used! Try Another.';
@@ -123,6 +150,55 @@ final class LandlordAccessController extends Controller implements LandlordAcces
         {*/
             return response()?->json($status, 200);
         /*}*/
+    }
+
+
+    public function VerifyEmail(string $verify, string $answer): JsonResponse
+    {
+        $status = array();
+        try
+        {
+            $confirm_verify_state = $this?->LandlordConfirmVerifiedStateViaId($verify);
+
+            if(!$confirm_verify_state)
+            {
+                $verify_state_was_changed = $this?->LandlordChangeVerifiedState($verify);
+                if(!$verify_state_was_changed)
+                {
+                    throw new Exception("Landlord Email was not verified!");
+                }
+    
+                $status = [
+                    'code' => 1,
+                    'serverStatus' => 'VerifiedSuccess!',
+                    'short_description' => 'Redirect to homepage here!'
+                ];
+            }
+            else
+            {
+                 //redirect to home page:
+                 $status = [
+                    'code' => 1,
+                    'serverStatus' => 'VerifiedAlready!',
+                    'short_description' => 'Redirect to homepage here!'
+                ];
+            }
+
+        }
+        catch(Exception $ex)
+        {
+            $status = [
+                'code' => 0,
+                'serverStatus' => 'VerifiedFailure!',
+                'short_description' => $ex?->getMessage(),
+            ];
+
+            return response()?->json($status, 400);
+        }
+        /*finally
+        {*/
+            return response()?->json($status, 200);
+        //}
     }
 
 
@@ -140,44 +216,49 @@ final class LandlordAccessController extends Controller implements LandlordAcces
 
             if($validator?->fails())
             {
-                throw new Exception("Invalid Input provided!");
+                throw new Exception("Invalid Input(s) provided!");
             }
 
-            $detailsFound = $this?->LandlordDetailsFoundService($request);
-            if(!$detailsFound)
+            $detailFound = $this?->LandlordAuthenticateService($request);
+            if(!$detailFound)
             {
-                throw new Exception("Failed login attempt. Invalid Email Provided!");
-            }
-
-            //verify password against the hashed password in the database:
-            //$is_pass_verified = password_verify($request?->buyer_password, $detailsFound['buyer_password']);
-
-            $hashedReqPass = $this?->TransformPassService($request?->buyer_password);
-            $hashedStoredPass = $detailsFound['buyer_password'];
-                
-            if($hashedReqPass !== $hashedStoredPass)
-            {
-                throw new Exception("Failed login attempt. Invalid Password Provided!");
+                throw new Exception("Failed login attempt. Invalid Email, Username or Password Provided!");
             }
 
             //now start to prepare to update login status:
             //set query:
-            $uniqueToken = $detailsFound['unique_buyer_id'];
-            $queryKeysValues = ['unique_buyer_id' => $uniqueToken];
+            $uniqueToken = $detailsFound->unique_landlord_id;
+            $queryKeysValues = [
+                'unique_landlord_id' => $uniqueToken
+            ];
             //set the is_logged_in status as true:
-            $newKeysValues = ['is_logged_in' => true];
+            $newKeysValues = [
+                'is_logged_in' => true
+            ];
 
             $change_login_status = $this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
 
             if(!$change_login_status)
             {
-                throw new Exception("Failed login attempt. Please try again!");
+                throw new Exception("Failed to update login status. Please try again!");
             }
 
+            //After logged in state was set, start generating the Bearer token for Authorization Header...
+
+            //Now create the token:
+            $auth_header_token = $detailsFound->createToken('auth_header_token', ['landlord-crud']);
+            $auth_header_token_text = $auth_header_token->plainTextToken;
+
+            //Then, build status:
             $status = [
                 'code' => 1,
-                'serverStatus' => 'Found!',
-                'uniqueToken' => $uniqueToken
+                'serverStatus' => 'LoginSuccess!',
+                //for subsequent calls inside the dashboard:
+                'UniqueId' => $detailsFound['unique_landlord_id'],//for Landlord Authentication
+                'landlordAuthToken' => $auth_header_token_text, //for Authorization header using Sanctum...
+                'decription' => "For subsequent calls to the dashboard endpoints, 
+                                    landlordUniqueId must be included in the request body while 
+                                    landlordAuthToken must be included in the Authorization header as a Bearer Token"
             ];
 
         }
@@ -185,7 +266,7 @@ final class LandlordAccessController extends Controller implements LandlordAcces
         {
             $status = [
                 'code' => 0,
-                'serverStatus' => 'NotFound!',
+                'serverStatus' => 'LoginFailure!',
                 'short_description' => $ex?->getMessage()
             ];
 
@@ -195,96 +276,161 @@ final class LandlordAccessController extends Controller implements LandlordAcces
             return response()?->json($status, 200);
         //}
     }
-
-
-    private function ConfirmLoginState(Request $request): JsonResponse
-    {
-        $status = array();
-
-        try
-        {
-            //get rules from validator class:
-            $reqRules = $this?->confirmLoginStateRules();
-
-            //validate here:'new_pass'
-            $validator = Validator::make($request?->all(), $reqRules);
-
-            if($validator?->fails())
-            {
-                throw new Exception("Invalid Input provided!");
-            }
-
-            $has_logged_in = $this?->LandlordConfirmLoginStateService($request);
-            if(!$has_logged_in)
-            {
-                throw new Exception("Not logged in yet!");
-            }
-
-            $status = [
-                'code' => 1,
-                'serverStatus' => 'LoggedIn!',
-            ];
-        }
-        catch(Exception $ex)
-        {
-            $status = [
-                'code' => 0,
-                'serverStatus' => 'NotLoggedIn!',
-                'short_description' => $ex?->getMessage(),
-            ];
-
-            return response()?->json($status, 400);
-        }
-        /*finally
-        {}*/
-        return response()?->json($status, 200);
-    }
     
 
-    private function ForgotPassword(Request $request): JsonResponse
-    {
-        $status = array();
-
-        try
-        {
-            //get rules from validator class:
-            $reqRules = $this?->forgotPasswordRules();
-
-            //validate here:'new_pass'
-            $validator = Validator::make($request?->all(), $reqRules);
-
-            if($validator?->fails())
-            {
-                throw new Exception("Invalid Input provided!");
-            }
-
-            $has_updated = $this?->LandlordUpdatePasswordService($request);
-
-            if(!$has_updated)
-            {
-                throw new Exception("Password could not be changed");
-            }
-
-            $status = [
-                'code' => 1,
-                'serverStatus' => 'passUpdated',
+     //For Guests(Logged out users):
+     public function SendResetPassLink(Request $request): JsonResponse
+     {
+         $status = array();
+         try
+         {
+              //get rules from validator class:
+              $reqRules = $this?->sendRequestPassLinkRules();
+ 
+              //validate here:
+              $validator = Validator::make($request?->all(), $reqRules);
+  
+             if($validator?->fails())
+             {
+                 throw new Exception("Invalid Input provided!");
+             }
+ 
+             //Get this landlord unique_landlord_id:
+             $queryKeysValues = [
+                'landlord_email'=>$request?->landlord_email
             ];
+             $uniqueID = $this?->LandlordReadSpecificService($queryKeysValues)->unique_landlord_id;
+ 
+             //Use this to form link:
+             $pass_reset_link_was_sent = $this?->SendPasswordResetMail($request, 'landlord.click.link.reset.password', [
+                 'reset' => $uniqueID,
+                 'answer' => 'done',
+             ]);
+ 
+             if(!$pass_reset_link_was_sent)
+             {
+                 //throw Exception:
+                 throw new Exception("Password Reset Link was not sent!");
+             }
+             $status = [
+                 'code' => 1,
+                 'serverStatus' => 'ResetLinkSent!',
+                 'pass_reset_link' =>  $pass_reset_link_was_sent
+             ];
+         }
+         catch(Exception $ex)
+         {
+             $status = [
+                 'code' => 0,
+                 'serverStatus' => 'ResetLinkNotSent!',
+                 'short_description' => $ex?->getMessage(),
+             ];
 
-        }
-        catch(Exception $ex)
-        {
-            $status = [
-                'code' => 0,
-                'serverStatus' => 'updateFailed',
-                'short_description' => $ex?->getMessage()
+             return response()?->json($status, 400);
+         }
+         /*finally
+         {*/
+             //return response:
+             return response()?->json($status, 200);
+         //}
+     }
+     
+ 
+     //for logged out user, outside the dashboard:
+     public function ClickResetPasswordLink(string $reset, string $answer): JsonResponse
+     {
+         $status = array();
+         try
+         {
+             $confirm_verify_state = $this?->LandlordConfirmVerifiedStateViaId($reset);
+ 
+             if(!$confirm_verify_state)
+             {
+                throw new LogicException("You can change your password only after your email has been verified! Please verify your email now to continue!");
+             }
+ 
+             //After this, return all both the landlord unique id and sanctum token (for Auth header):
+             $queryKeysValues = [
+                'unique_landlord_id' => $reset
             ];
-
+             $landlordObject = $this?->LandlordReadSpecificService($queryKeysValues);
+             //Now create new sanctum token :
+             $auth_header_token = $landlordObject->createToken('auth_header_token', ['landlord-update']);
+             $auth_header_token_text = $auth_header_token?->plainTextToken;
+ 
+             $status = [
+                 'code' => 1,
+                 'serverStatus' => 'ResetAccessGranted!',
+                 //for subsequent calls inside the dashboard:
+                 'landlordUniqueId' => $landlordObject['unique_landlord_id'],//for Landlord Authentication
+                 'landlordAuthToken' => $auth_header_token_text, //for Authorization header using Sanctum...
+                 'decription' => "For the next password reset request (user interface), 
+                                    landlordUniqueId must be included in the request body while 
+                                    landlordAuthToken must be included in the Authorization header as a Bearer Token"
+             ];
+     
+         }
+         catch(Exception $ex)
+         {
+            $status = [
+                 'code' => 0,
+                 'serverStatus' => 'ResetAccessRevoked!',
+                 'short_description' => $ex?->getMessage(),
+            ];
+ 
             return response()?->json($status, 400);
-        }
-        //finally{*/
-            return response()?->json($status, 200);
-        //}
-    }
+         }
+         
+         /*finally
+         {*/
+             return response()?->json($status, 200);
+         //}
+     }
+    
+ 
+     public function ImplementResetPassword(Request $request): JsonResponse
+     {
+         $status = array();
+ 
+         try
+         {       
+             //get rules from validator class:
+             $reqRules = $this?->implementResetPasswordRules();
+ 
+             //validate here:'new_pass'
+             $validator = Validator::make($request?->all(), $reqRules);
+ 
+             if($validator?->fails())
+             {
+                 throw new Exception("Invalid Input provided!");
+             }
+ 
+             $password_was_updated = $this?->LandlordUpdatePasswordService($request);
+ 
+             if(!$password_was_updated)
+             {
+                 throw new Exception("Password could not be changed!");
+             }
+ 
+             $status = [
+                'code' => 1,
+                'serverStatus' => 'PassResetSuccess!',
+             ];
+ 
+         }
+         catch(Exception $ex)
+         {
+             $status = [
+                 'code' => 0,
+                 'serverStatus' => 'PassResetFailure!',
+                 'short_description' => $ex?->getMessage()
+             ];
+         }
+         /*finally
+         {*/
+             return response()?->json($status, 200);
+         //}
+     }    
     
 
     private function Logout(Request $request):  JsonResponse

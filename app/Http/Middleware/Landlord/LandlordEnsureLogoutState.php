@@ -29,11 +29,11 @@ final class LandlordEnsureLogoutState
         $is_logged_out = $this?->LandlordLogoutService($request);
         if(!$is_logged_out)
         {
-          throw new \Exception('Could not logout landlord before password reset!');
+          throw new Exception('Could not logout landlord before password reset!');
         }
       }
     }
-    catch(\Exception $ex)
+    catch(Exception $ex)
     {
       $status = [
         'code' => 0,

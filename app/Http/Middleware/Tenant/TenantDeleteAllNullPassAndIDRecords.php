@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Closure;
 use App\Services\Traits\ModelAbstractions\Tenant\TenantAccessAbstraction;
 
-final class TenantDeleteAllNull
+final class TenantDeleteAllNullPassAndIDRecords
 {
 	use TenantAccessAbstraction;
 
@@ -19,6 +19,8 @@ final class TenantDeleteAllNull
             'unique_tenant_id' => 'null',
             'tenant_password' => 'null'
         ];
+
+		//This is to clear the database of all partially saved user data:
 
 		$this?->TenantDeleteAllNullService($deleteKeysValues);
 

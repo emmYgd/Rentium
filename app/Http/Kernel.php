@@ -17,13 +17,16 @@ class Kernel extends HttpKernel
     //Global Middleware:
     protected $middleware = [
         // \App\Http\Middleware\General\TrustHosts::class,
-        //\Fruitcake\Cors\HandleCors::class,
-        //\App\Http\Middleware\General\TrustProxies::class,
-        \Illuminate\Http\Middleware\HandleCors::class,
-        //\App\Http\Middleware\General\PreventRequestsDuringMaintenance::class,
-        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        //\App\Http\Middleware\General\TrimStrings::class,
-        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+
+        Illuminate\Http\Middleware\HandleCors::class,
+        Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        
+        App\Http\Middleware\General\TrustProxies::class,
+        App\Http\Middleware\General\TrimStrings::class,
+        App\Http\Middleware\General\PreventRequestsDuringMaintenance::class,
+
+        //App\Http\Middleware\General\CreateDBonDeploy::class,
     ];
 
     /**
@@ -44,6 +47,7 @@ class Kernel extends HttpKernel
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            //'throttle:api',//remember to put this back in deployment...
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];

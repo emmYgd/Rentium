@@ -51,7 +51,12 @@ trait ComputeUniqueIDService
 		return $uuid;
 	}
 
-	
+	protected function genUniqueIDwithULID(): string
+	{
+		//use Illuminate's string uuid method:
+		$ulid = Str::ulid()->toString();
+		return $ulid;
+	}
 }
 
 ?>

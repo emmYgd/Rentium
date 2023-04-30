@@ -22,7 +22,7 @@ final class DestroyTokenAfterLogout
         //get the user object:
 		try
 		{
-        	$tenantObject = $this?->TenantDetailsFoundService($request);
+        	$tenantObject = $this?->TenantFoundDetailService($request);
 
 			//query params:
 			$queryKeysValues = [
@@ -39,11 +39,11 @@ final class DestroyTokenAfterLogout
 				$login_status_was_updated = $this?->TenantUpdateSpecificService($queryKeysValues, $newKeysValues);
 				if($login_status_was_updated)
 				{
-					throw new \Exception("Failed to Logout: Auth Bearer Token cannot be deleted!");
+					throw new Exception("Failed to Logout: Auth Bearer Token cannot be deleted!");
 				}
 			}
 		}
-		catch(\Exception $ex)
+		catch(Exception $ex)
 		{
 			$status = [
 				'code' => 0,

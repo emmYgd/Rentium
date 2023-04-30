@@ -28,7 +28,7 @@ final class LandlordConfirmVerifyState
                 $landlord_was_verified_using_email = $this?->LandlordConfirmVerifiedStateViaEmail($landlord_email);
                 if(!$landlord_was_verified_using_email)
                 {
-                    throw new \Exception("You are not verified yet! Follow the link sent to your mail to activate your account!");
+                    throw new Exception("You are not verified yet! Follow the link sent to your mail to activate your account!");
                 }
             }
 
@@ -37,12 +37,12 @@ final class LandlordConfirmVerifyState
                 $landlord_was_verified_using_id = $this?->LandlordConfirmVerifiedStateViaId($landlord_unique_id);
                 /*if(!$landlord_was_verified_using_id)
                 {
-                    throw new \Exception("You are not verified yet! Follow the link sent to your mail to activate your account!");
+                    throw new Exception("You are not verified yet! Follow the link sent to your mail to activate your account!");
                 }*/
             }
            
         }
-        catch(\Exception $ex)
+        catch(Exception $ex)
         {
             $status = [
                 'code' => 0,

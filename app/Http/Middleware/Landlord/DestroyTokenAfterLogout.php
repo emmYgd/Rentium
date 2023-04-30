@@ -22,26 +22,30 @@ final class DestroyTokenAfterLogout
         //get the user object:
 		try
 		{
-        	$landlordObject = $this?->LandlordDetailsFoundService($request);
+        	$landlordObject = $this?->LandlordFoundDetailService($request);
 
 			//query params:
-			$queryKeysValues = ['tokenable_id' => $landlordObject?->id];
+			$queryKeysValues = [
+				'tokenable_id' => $landlordObject?->id
+			];
         	//use object to delete token:
         	$landlord_token_was_deleted = $landlordObject?->tokens()?->where($queryKeysValues)?->delete();
 			if(!$landlord_token_was_deleted)
 			{
-				$queryKeysValues = ['unique_landlord_id' => $request?->unique_landlord_id];
+				$queryKeysValues = [
+					'unique_landlord_id' => $request?->unique_landlord_id
+				];
 				$newKeysValues = [ 'is_logged_in' => true];
 
 				//restore this user back to a logged in user:
 				$login_status_was_updated = $this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
 				if($login_status_was_updated)
 				{
-					throw new \Exception("Failed to Logout: Auth Bearer Token cannot be deleted!");
+					throw new Exception("Failed to Logout: Auth Bearer Token cannot be deleted!");
 				}
 			}
 		}
-		catch(\Exception $ex)
+		catch(Exception $ex)
 		{
 			$status = [
 				'code' => 0,

@@ -21,19 +21,19 @@ final class TenantEnsureLogoutState
     //Before:
     try
     {
-      $logged_in = $this?->TenantConfirmLoginStateService($request);
+      $is_logged_in = $this?->TenantConfirmLoginStateService($request);
 
-      if($logged_in)
+      if($is_logged_in)
       {
         //log user out:
         $is_logged_out = $this?->TenantLogoutService($request);
         if(!$is_logged_out)
         {
-          throw new \Exception('Could not logout tenant before password reset!');
+          throw new Exception('Could not logout tenant!');
         }
       }
     }
-    catch(\Exception $ex)
+    catch(Exception $ex)
     {
       $status = [
         'code' => 0,

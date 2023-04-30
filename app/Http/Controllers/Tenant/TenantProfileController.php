@@ -161,6 +161,53 @@ final class TenantProfileController extends Controller implements TenantProfileI
             return response()?->json($status, 200);
         //}
     }
+
+
+       //for logged in users, from the dashboard:
+        public function ChangePassword(Request $request): JsonResponse
+        {
+            $status = array();
+    
+            try
+            {       
+                //get rules from validator class:
+                $reqRules = $this?->changePasswordRules();
+    
+                //validate here:'new_pass'
+                $validator = Validator::make($request?->all(), $reqRules);
+    
+                if($validator?->fails())
+                {
+                    throw new Exception("Invalid Input provided!");
+                }
+    
+                $password_was_updated = $this?->TenantUpdatePasswordService($request);
+    
+                if(!$password_was_updated)
+                {
+                    throw new Exception("Password could not be changed!");
+                }
+    
+                $status = [
+                    'code' => 1,
+                    'serverStatus' => 'PassUpdateSuccess!',
+                ];
+    
+            }
+            catch(\Exception $ex)
+            {
+                $status = [
+                    'code' => 0,
+                    'serverStatus' => 'PassUpdateFailure!',
+                    'short_description' => $ex?->getMessage()
+                ];
+            }
+            /*finally
+            {*/
+                return response()?->json($status, 200);
+            //}
+        }
+
     
 }
 

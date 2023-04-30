@@ -17,16 +17,19 @@ trait TenantAccessAbstraction
 	use ComputeUniqueIDService;
 	use PassHashVerifyService;
 
+
 	protected function TenantConfirmLoginStateService(Request $request) : bool
 	{
-
-		$queryKeysValues = ['unique_tenant_id' => $request?->unique_tenant_id];
-		$detailsFound = $this?->TenantReadSpecificService($queryKeysValues);
+		$queryKeysValues = [
+			'unique_tenant_id' => $request?->unique_tenant_id
+		];
+		$foundDetail  = $this?->TenantReadSpecificService($queryKeysValues);
 
 		//get the login state:
-		$login_status = $detailsFound['is_logged_in'];
+		$login_status = $foundDetail ['is_logged_in'];
 		return $login_status;
 	}
+
 
 	protected function TenantLogoutService(Request $request): bool
 	{
@@ -49,28 +52,56 @@ trait TenantAccessAbstraction
 		return $were_details_saved;
 	}
 
+
 	protected function TenantDeleteSpecificService($deleteKeysValues): bool
 	{
 		$were_details_deleted = $this?->TenantDeleteSpecificService($deleteKeysValues);
 		return $were_details_deleted;
 	}
 
-	protected function TenantDetailsFoundService(Request $request) : Tenant | null
-	{
-		$tenant_email = $request?->tenant_email;
 
-        //query KeyValue Pair:
-        $queryKeysValues = ['tenant_email' => $tenant_email];
-        $were_details_found = $this?->TenantReadSpecificService($queryKeysValues);
-        return $were_details_found;
+	protected function TenantAuthenticateService(Request $request) : Tenant | null
+	{
+		$tenant_username_or_email = $request?->tenant_username_or_email;
+		
+		//query KeyValue Pair:
+		//first check for email:
+		$queryKeysValues = [
+			'tenant_email' => $tenant_username_or_email,
+		];
+		$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
+		if(!$foundDetail)
+		{
+			//query KeyValue Pair:
+			$queryKeysValues = [
+				'tenant_username' => $tenant_username_or_email,
+			];
+			$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				throw new Exception("Failed login attempt. Invalid Email or Username Provided!");
+			}
+		}
+
+		//else: continue with password Auth
+		//verify password against the hashed password in the database:
+        $dbHashedPass = $foundDetail->tenant_password;
+		$requestPass = $request->tenant_password;
+		$was_pass_verified = $this?->CustomVerifyPassword($requestPass, $dbHashedPass);
+		if(!$was_pass_verified)
+		{
+			throw new Exception("Failed login attempt. Invalid Password Provided!");
+		}
+		//else:
+        return $foundDetail;
     }
 
 
     protected function TenantDeleteAllNullService($deleteKeysValues): bool
     {
     	//get all null valued collections:
-    	$were_null_deleted = $this?->TenantDeleteSpecificService($deleteKeysValues);
-    	return $were_null_deleted;
+    	$were_all_null_deleted = $this?->TenantDeleteSpecificService($deleteKeysValues);
+    	return $were_all_null_deleted;
     }
 
 
@@ -107,6 +138,7 @@ trait TenantAccessAbstraction
 
         return true;
 	}
+
 
 }
 

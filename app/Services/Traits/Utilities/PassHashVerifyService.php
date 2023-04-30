@@ -2,31 +2,28 @@
 
 namespace App\Services\Traits\Utilities;
 
+use Illuminate\Support\Facades\Hash;
+
 trait PassHashVerifyService
 {
-
-	protected function HashPassword(/*string*/ $password) /*: string*/
-	{
-		$passHash = password_hash($password, PASSWORD_DEFAULT);
-		return $passHash;
-	}
-
-
-	protected function VerifyPassword(/*string*/ $password, /*string*/ $hash) /*: bool*/
-	{
-		$passVerify = password_verify($password, $hash);
-		return $passVerify;
-	}
-
-	protected function TransformPassService(string $reqPass): string
+	protected function CustomHashPassword(string $reqPass): string
     {
-    	$returnValueOrState = null;
+    	$firstPass = Hash::make($reqPass);
+    	/*$secondPass = Hash::make($reqPass);
+		$thirdPass = Hash::make($reqPass);
+    	$finalHashedPass = Hash::make($firstPass . $secondPass . $thirdPass);*/
 
-    	$firstPass = md5(md5($reqPass));
-    	$secondPass = md5(md5($reqPass));
-    	$finalHashedPass = md5($firstPass . $secondPass);
-
-    	return $finalHashedPass;
+    	return $firstPass;
     }
+
+	protected function CustomVerifyPassword(string $password, string $hash): bool
+	{
+		//Check for equality:
+		if(!Hash::check($password, $hash))
+		{
+			return false;
+		}
+		return true;
+	}
 
 }

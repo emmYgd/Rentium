@@ -23,8 +23,11 @@ return new class extends Migration
             $table?->string('tenant_middle_name')?->nullable();
             $table?->string('tenant_last_name');
 
-            $table?->string('tenant_username')?->unique()?->nullable();
+           
             $table?->string('tenant_email')?->unique();
+            $table?->boolean('is_email_verified')?->default(false);
+            
+            $table?->string('tenant_username')?->unique()?->nullable();
             $table?->string('tenant_phone_number')?->nullable()?->unique();
             //it cannot be filled by mass assignment:
             $table?->string('password')?->unique();
@@ -41,20 +44,6 @@ return new class extends Migration
 
             $table?->boolean('tenant_got_pet')?->nullable();
             $table?->json('pet_type')?->nullable();
-
-            /*$table?->string('tenant_bank_first_name')?->nullable();
-            $table?->string('tenant_bank_middle_name')?->nullable();
-            $table?->string('tenant_bank_last_name')?->nullable();*/
-
-             //On the frontend: (MasterCard - Debit, Visa - Debit)They will all be encrypted...
-            /*$table?->longText('tenant_bank_card_type')?->nullable();
-            $table?->longText('tenant_bank_card_number')?->unique()?->nullable();
-            $table?->longText('tenant_bank_card_cvv')?->unique()?->nullable();
-            $table?->longText('tenant_bank_card_expiry_month')?->nullable();
-            $table?->longText('tenant_bank_card_expiry_year')?->nullable();*/
-
-            /*$table?->string('tenant_referral_link')?->unique()?->nullable();
-            $table?->string('tenant_total_referral_bonus')?->nullable();*/
 
             $table?->timestamps();
         });
