@@ -60,6 +60,40 @@ class Kernel extends HttpKernel
      * @var array<string, class-string|string>
      */
     protected $middlewareAliases = [
+        //For Tenants:
+        'TenantEnsureLogoutState' => \App\Http\Middleware\Tenant\TenantEnsureLogoutState::class,
+        'TenantCleanNullRecords' =>  \App\Http\Middleware\Tenant\TenantDeleteAllNull::class,
+        'TenantConfirmLoginState' => \App\Http\Middleware\Tenant\TenantConfirmLoginState::class,
+        'TenantConfirmVerifyState' => \App\Http\Middleware\Tenant\TenantConfirmVerifyState::class,
+        'DestroyTokenAfterLogout' => \App\Http\Middleware\Tenant\DestroyTokenAfterLogout::class,
+        //For Carts
+        //'DeleteEmptyCarts' => \App\Http\Middleware\General\DeleteEmptyCarts::class,
+        //'CartEnsureNotCleared' => \App\Http\Middleware\General\CartEnsureNotCleared::class,
+        //For Wishlists
+        //'DeleteEmptyWishlists' => \App\Http\Middleware\General\DeleteEmptyWishlists::class,
+        //For Billing And Shipping:
+        //'DeleteEmptyBillingAndShipping' => \App\Http\Middleware\Tenant\DeleteEmptyBillingAndShipping::class,
+
+
+        //For Landlords:
+        'LandlordEnsureLogoutState' => \App\Http\Middleware\Landlord\LandlordEnsureLogoutState::class,
+        'LandlordCleanNullRecords' =>  \App\Http\Middleware\Landlord\LandlordDeleteAllNull::class,
+        'LandlordConfirmLoginState' => \App\Http\Middleware\Landlord\LandlordConfirmLoginState::class,
+        'LandlordConfirmVerifyState' => \App\Http\Middleware\Landlord\LandlordConfirmVerifyState::class,
+        'DestroyTokenAfterLogout' => \App\Http\Middleware\Landlord\DestroyTokenAfterLogout::class,
+
+        //For Admin:
+        'AdminCreateBoss' => \App\Http\Middleware\Admin\AdminCreateBoss::class,
+        'AdminEnsureLogoutState' => \App\Http\Middleware\Admin\AdminEnsureLogoutState::class,
+        'AdminCleanNullRecords' =>  \App\Http\Middleware\Admin\AdminDeleteAllNull::class,
+        'AdminConfirmLoginState' => \App\Http\Middleware\Admin\AdminConfirmLoginState::class,
+        'AdminConfirmVerifyState' => \App\Http\Middleware\Admin\AdminConfirmVerifyState::class,
+        'DestroyTokenAfterLogout' => \App\Http\Middleware\Admin\DestroyTokenAfterLogout::class,
+
+        //Check for sanctum auth token abilities:
+        'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+        'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+
         'auth' => \App\Http\Middleware\General\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,

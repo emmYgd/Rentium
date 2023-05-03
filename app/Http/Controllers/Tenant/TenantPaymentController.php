@@ -158,7 +158,7 @@ final class TenantPaymentController extends Controller implements TenantPaymentI
     }
 
 
-    private function FetchBankCardDetailsRule(Request $request): JsonResponse
+    private function FetchBankCardDetails(Request $request): JsonResponse
     {
         $status = array();
 
