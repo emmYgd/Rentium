@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Events\Dispatcher;
 
-use App\Services\Traits\ModelAbstractions\Tenant\TenantAccessAbstraction;
+use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
 use App\Services\Traits\Utilities\GenerateLinksService;
 
 use App\Events\Tenant\TenantHasRegistered;

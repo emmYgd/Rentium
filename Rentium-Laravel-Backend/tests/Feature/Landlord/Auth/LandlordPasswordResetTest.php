@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
-/*class PasswordResetTest extends TestCase
+/*class LandlordPasswordResetTest extends TestCase
 {
     //use RefreshDatabase;
 

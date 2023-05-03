@@ -11,7 +11,7 @@ use App\Http\Validators\Tenant\TenantAccessRequestRules;
 use App\Services\Interfaces\Tenant\TenantAccessInterface;
 use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
 
-use App\Services\Traits\ModelAbstraction\General\Tenant\EmailVerificationNotificationAbstraction;
+//use App\Services\Traits\ModelAbstraction\General\Tenant\EmailVerificationNotificationAbstraction;
 use App\Services\Traits\ModelAbstraction\General\Tenant\VerifyEmailAbstraction;
 use App\Services\Traits\ModelAbstraction\General\Tenant\PasswordResetLinkAbstraction;
 use App\Services\Traits\ModelAbstraction\General\Tenant\NewPasswordAbstraction;

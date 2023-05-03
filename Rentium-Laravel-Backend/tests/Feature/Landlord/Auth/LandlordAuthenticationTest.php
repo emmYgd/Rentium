@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class AuthenticationTest extends TestCase
+/*class LandlordAuthenticationTest extends TestCase
 {
     /*use RefreshDatabase;
 
@@ -33,5 +33,5 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertGuest();
-    }*/
-}
+    }
+}*/

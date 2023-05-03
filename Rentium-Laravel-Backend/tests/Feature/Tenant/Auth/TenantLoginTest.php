@@ -5,17 +5,17 @@ namespace Tests\Feature\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/*class LoginTest extends TestCase
+/*class TenantLoginTest extends TestCase
 {
     //use RefreshDatabase;
 
-    /*public function test_new_vendors_can_login()
+    /*public function test_new_buyers_can_login()
     {
         $response = $this->patchJson(
-            route('vendor.login'), 
+            route('buyer.login'), 
             [
-                'vendor_email' => 'emmanueladediji@gmail.com',
-                'vendor_password' => 'emma@12crown',
+                'buyer_email' => 'emmdammy@gmail.com',
+                'buyer_password' => 'emma@12crown',
             ],
             []
         );
@@ -26,4 +26,3 @@ use Tests\TestCase;
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
     }
 }*/
-

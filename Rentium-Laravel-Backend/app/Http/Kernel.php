@@ -18,13 +18,13 @@ class Kernel extends HttpKernel
     protected $middleware = [
         // \App\Http\Middleware\General\TrustHosts::class,
 
-        Illuminate\Http\Middleware\HandleCors::class,
-        Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+       \Illuminate\Http\Middleware\HandleCors::class,
+        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         
-        App\Http\Middleware\General\TrustProxies::class,
-        App\Http\Middleware\General\TrimStrings::class,
-        App\Http\Middleware\General\PreventRequestsDuringMaintenance::class,
+        \App\Http\Middleware\General\TrustProxies::class,
+        \App\Http\Middleware\General\TrimStrings::class,
+        \App\Http\Middleware\General\PreventRequestsDuringMaintenance::class,
 
         //App\Http\Middleware\General\CreateDBonDeploy::class,
     ];

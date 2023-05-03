@@ -5,16 +5,16 @@ namespace Tests\Feature\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/*class AuthChangePasswordTest extends TestCase
+class AdminAuthChangePasswordTest extends TestCase
 {
     //use RefreshDatabase;
 
-    /*public function test_auth_vendors_can_change_password()
+    /*public function test_auth_admins_can_change_password()
     {
         $response = $this->putJson(
-            route('vendor.change.password'), 
+            route('admin.change.password'), 
             [
-                'unique_vendor_id' => 'YsBInb80f6',
+                'unique_admin_id' => 'YsBInb80f6',
                 'new_password' => 'Emmy@234ade',
                 'new_password_confirmation' => 'Emmy@234ade'
             ],
@@ -26,4 +26,4 @@ use Tests\TestCase;
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
     }*/
-//}
+}

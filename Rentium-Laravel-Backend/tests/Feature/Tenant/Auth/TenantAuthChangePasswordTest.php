@@ -5,7 +5,7 @@ namespace Tests\Feature\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/*class AuthChangePasswordTest extends TestCase
+/*class TenantAuthChangePasswordTest extends TestCase
 {
     //use RefreshDatabase;
 

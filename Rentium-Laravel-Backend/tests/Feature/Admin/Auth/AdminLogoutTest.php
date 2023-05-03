@@ -5,18 +5,16 @@ namespace Tests\Feature\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class AuthChangePasswordTest extends TestCase
+class AdminLogoutTest extends TestCase
 {
     //use RefreshDatabase;
 
-    /*public function test_auth_admins_can_change_password()
+    /*public function test_new_admins_can_logout()
     {
-        $response = $this->putJson(
-            route('admin.change.password'), 
+        $response = $this->patchJson(
+            route('admin.logout'), 
             [
                 'unique_admin_id' => 'YsBInb80f6',
-                'new_password' => 'Emmy@234ade',
-                'new_password_confirmation' => 'Emmy@234ade'
             ],
             ['HTTP_Authorization' => 'Bearer ' . '2|ROPFqP5F9wwsnvbNtPYP9K9LEO74SItDyHSzUABA']
         );

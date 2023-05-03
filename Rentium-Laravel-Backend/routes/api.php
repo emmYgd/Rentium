@@ -73,7 +73,6 @@ Route::prefix("v1/tenant/")->group(function()
 		]);
 	});
 
-
 	Route::prefix("searches/")->group(function() 
 	{
 		$common_house_fetch_controller_url = "App\Http\Controllers\Tenant\TenantHouseFetchController";
@@ -95,40 +94,42 @@ Route::prefix("v1/tenant/")->group(function()
 
 		Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:tenant-crud", "TenantConfirmLoginState", "TenantConfirmVerifyState"])->group(function()
 		{
+			$common_house_fetch_controller_url = "App\Http\Controllers\Tenant\TenantHouseFetchController";
+
 			Route::get("fetch/all/landords/summary", [
 				"as" => "tenant.fetch.all.landlords",
 				//"middleware" => "",
-				"uses" => "{$common_landlord_fetch_controller_url}@FetchAllLandlordSummary"
+				"uses" => "{$common_house_fetch_controller_url}@FetchAllLandlordSummary"
 			]);
 	
 			Route::post("fetch/each/landlord/detail", [
 				"as" => "tenant.fetch.specific.landlord", 
 				//"middleware" => [],
-    			"uses" => "{$common_landlord_fetch_controller_url}@SearchForLandlord"
+    			"uses" => "{$common_house_fetch_controller_url}@SearchForLandlord"
 			]);
 
 			Route::post("fetch/all/landlord/invitations", [
 				"as" => "tenant.fetch.all.invitations", 
 				//"middleware" => "",
-    			"uses" => "{$common_landlord_fetch_controller_url}@SearchAllPropertyInvitations"
+    			"uses" => "{$common_house_fetch_controller_url}@SearchAllPropertyInvitations"
 			]);
 
 			Route::post("fetch/each/landlord/invitation", [
 				"as" => "tenant.fetch.each.invitation", 
 				//"middleware" => ,
-    			"uses" => "{$common_landlord_fetch_controller_url}@SearchEachPropertyInvitation"
+    			"uses" => "{$common_house_fetch_controller_url}@SearchEachPropertyInvitation"
 			]);
 
 			Route::post("fetch/all/own/requests/made", [
 				"as" => "tenant.fetch.all.requests", 
 				//"middleware" => "",
-    			"uses" => "{$common_landlord_fetch_controller_url}@SearchAllPropertyRequests"
+    			"uses" => "{$common_house_fetch_controller_url}@SearchAllPropertyRequests"
 			]);
 
 			Route::post("fetch/each/own/request/made", [
 				"as" => "tenant.fetch.each.own.request", 
 				//"middleware" => "",
-    			"uses" => "{$common_landlord_fetch_controller_url}@SearchEachPropertyRequest"
+    			"uses" => "{$common_house_fetch_controller_url}@SearchEachPropertyRequest"
 			]);
 		});
 	});
@@ -478,19 +479,19 @@ Route::prefix("v1/landlord/")->group(function()
 		Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:landlord-crud", "LandlordConfirmLoginState", "LandlordConfirmVerifyState"])->group(function()
 		{
 
-			$common_house_fetch_controller_url = "App\Http\Controllers\Landlord\LandlordHouseFetchDetailsController";
+			$common_landlord_fetch_controller_url = "App\Http\Controllers\Landlord\LandlordHouseFetchDetailsController";
 			$common_landlord_house_tenant_controller_url = "App\Http\Controllers\Landlord\LandlordToTenantInteractionsController";
 			
 			Route::get("fetch/all/own/propertys", [
 				"as" => "fetch.all.own.propertys",
 				//"middleware" => "init",
-				"uses" => "{$common_house_tenant_controller_url}@FetchAllOwnHouseDetailsSummary"
+				"uses" => "{$common_landlord_fetch_controller_url}@FetchAllOwnHouseDetailsSummary"
 			]);
 
 			Route::get("fetch/each/own/property/details/", [
 				"as" => "fetch.each.own.property",
 				//"middleware" => "init",
-				"uses" => "{$common_house_fetch_controller_url}@FetchEachHousingDetails"
+				"uses" => "{$common_landlord_fetch_controller_url}@FetchEachHousingDetails"
 			]);	
 
 			Route::get("fetch/all/tenants/summary", [
@@ -565,7 +566,7 @@ Route::prefix("v1/landlord/")->group(function()
 			Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:landlord-crud", "LandlordConfirmLoginState", "LandlordConfirmVerifyState"])->group(function()
 			{
 				$common_house_uploads_controller_url = "App\Http\Controllers\Landlord\LandlordHouseUploadDetailsController";
-				$common_house_edit_controller_url = "App\Http\Controllers\Landlord\LandlordHouseEditDetailsController";
+				$common_house_edits_controller_url = "App\Http\Controllers\Landlord\LandlordHouseEditDetailsController";
 				$common_house_delete_controller_url = "App\Http\Controllers\Landlord\LandlordHouseDeleteDetailsController";
 
 				Route::post("property/upload/text/details", [
@@ -589,7 +590,7 @@ Route::prefix("v1/landlord/")->group(function()
 				Route::patch("property/edit/text/details", [
 					"as" => "landlord.edit.property.text",
 					//"middleware" => "init",
-					"uses" => "{$common_house_edit_controller_url}@EditHouseTextDetails"
+					"uses" => "{$common_house_edits_controller_url}@EditHouseTextDetails"
 				]);
 
 				Route::patch("property/edit/image/details", [
@@ -878,7 +879,7 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 
 		Route::prefix("action/")->group(function()
 		{
-			$common_admin_action_controller = "App\Http\Controllers\Admin\AdminLandlordTenantGeneralActionController";
+			$common_admin_action_controller_url = "App\Http\Controllers\Admin\AdminLandlordTenantGeneralActionController";
 
 			Route::patch("ban/landlord", [
 				"as" => "admin.ban.landlord",

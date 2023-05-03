@@ -5,23 +5,23 @@ namespace Tests\Feature\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class LogoutTest extends TestCase
+/*class TenantLogoutTest extends TestCase
 {
     //use RefreshDatabase;
 
-    /*public function test_new_admins_can_logout()
+    /*public function test_new_buyers_can_logout()
     {
         $response = $this->patchJson(
-            route('admin.logout'), 
+            route('buyer.logout'), 
             [
-                'unique_admin_id' => 'YsBInb80f6',
+                'unique_buyer_id' => 'Jt0AUFGSky',
             ],
-            ['HTTP_Authorization' => 'Bearer ' . '2|ROPFqP5F9wwsnvbNtPYP9K9LEO74SItDyHSzUABA']
+            ['HTTP_Authorization' => 'Bearer ' . '14|olcYKSQG6vGpFed3ECWkH0sRImSacy31XRXBK5S8']
         );
 
         //$this->assertAuthenticated();
         //$response->assertNoContent();
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
-    }*/
-}
+    }
+}*/

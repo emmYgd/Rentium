@@ -4,8 +4,8 @@ namespace App\Services\Traits\ModelAbstraction\Tenant;
 
 use Illuminate\Http\Request;
 
-use App\Models\Tenant;
-use App\Services\Traits\ModelCRUD\TenantCRUD;
+use App\Models\Tenant\Tenant;
+use App\Services\Traits\ModelCRUD\Tenant\TenantCRUD;
 use App\Services\Traits\Utilities\PassHashVerifyService;
 use App\Services\Traits\Utilities\ComputeUniqueIDService;
 

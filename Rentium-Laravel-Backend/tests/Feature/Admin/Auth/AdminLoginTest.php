@@ -5,9 +5,9 @@ namespace Tests\Feature\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class LoginTest extends TestCase
+class AdminLoginTest extends TestCase
 {
-    //use RefreshDatabase;
+    /*use RefreshDatabase;
 
     public function test_new_admins_can_login()
     {
@@ -24,5 +24,5 @@ class LoginTest extends TestCase
         //$response->assertNoContent();
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
-    }
+    }*/
 }

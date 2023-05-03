@@ -8,12 +8,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
-/*class PasswordResetTest extends TestCase
+class AdminPasswordResetTest extends TestCase
 {
     //use RefreshDatabase;
 
     /*public function test_reset_password_link_can_be_requested()
-    {*/
+    {
         /*Notification::fake();
 
         $user = User::factory()->create();
@@ -23,9 +23,9 @@ use Tests\TestCase;
         Notification::assertSentTo($user, ResetPassword::class);*/
 
         /*$response = $this->postJson(
-            route('buyer.password.reset.link'), 
+            route('admin.password.reset.link'), 
             [
-                'buyer_email' => 'emmdammy@gmail.com',
+                'admin_email' => 'emmanueladediji@gmail.com',
             ],
             []
         );
@@ -59,14 +59,14 @@ use Tests\TestCase;
         });*/
 
         /*$response = $this->put(
-            route('buyer.reset.password'), 
+            route('admin.reset.password'), 
             [
-                'unique_buyer_id' => 'Jt0AUFGSky',
+                'unique_admin_id' => 'YsBInb80f6',
                 'new_password' => 'Y_emmy@12e_crown',
                 'new_password_confirmation' => 'Y_emmy@12e_crown',
             ],
             [
-                'HTTP_Authorization' => 'Bearer ' . '20|smy72I9llvyAr8ngR5fze7f1HjIOQt1PeWZmKwed',
+                'HTTP_Authorization' => 'Bearer ' . '3|wT9MaJfSy0CFSQi4VYNt1NFLPjHXjGvfihGue8r1',
                 'Accept' => 'application/json'
             ]
         );
@@ -75,6 +75,6 @@ use Tests\TestCase;
         //$response->assertNoContent();
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
-    }
+    }*/
 
-}*/
+}
