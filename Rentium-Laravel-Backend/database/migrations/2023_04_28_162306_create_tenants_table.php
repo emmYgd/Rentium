@@ -28,9 +28,9 @@ return new class extends Migration
             $table?->boolean('is_email_verified')?->default(false);
             
             $table?->string('tenant_username')?->unique()?->nullable();
-            $table?->string('tenant_phone_number')?->nullable()?->unique();
+            $table?->string('tenant_phone_number')?->unique()?->nullable();
             //it cannot be filled by mass assignment:
-            $table?->string('password')?->unique();
+            $table?->string('tenant_password')?->unique()?->nullable();
 
             $table?->string('tenant_current_country')?->nullable();
             $table?->string('tenant_current_state')?->nullable();

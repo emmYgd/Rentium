@@ -44,7 +44,7 @@ trait TenantAccessAbstraction
 		return $was_logged_out;
 	}
 
-	protected function TenantRegisterService(Request $request): bool
+	protected function TenantRegisterService(Request $request): Tenant //bool
 	{
 		$newKeyValues = $request?->all();
 		//create new tenant:
@@ -79,7 +79,7 @@ trait TenantAccessAbstraction
 			$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
 			if(!$foundDetail)
 			{
-				throw new Exception("Failed login attempt. Invalid Email or Username Provided!");
+				throw new \Exception("Failed login attempt. Invalid Email or Username Provided!");
 			}
 		}
 
@@ -90,11 +90,38 @@ trait TenantAccessAbstraction
 		$was_pass_verified = $this?->CustomVerifyPassword($requestPass, $dbHashedPass);
 		if(!$was_pass_verified)
 		{
-			throw new Exception("Failed login attempt. Invalid Password Provided!");
+			throw new \Exception("Failed login attempt. Invalid Password Provided!");
 		}
 		//else:
         return $foundDetail;
     }
+
+
+	protected function TenantDetailsFoundService(Request $request): Tenant 
+	{
+		$tenant_username_or_email = $request?->tenant_username_or_email;
+		
+		//query KeyValue Pair:
+		//first check for email:
+		$queryKeysValues = [
+			'tenant_email' => $tenant_username_or_email,
+		];
+		$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
+		if(!$foundDetail)
+		{
+			//query KeyValue Pair:
+			$queryKeysValues = [
+				'tenant_username' => $tenant_username_or_email,
+			];
+			$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				throw new \Exception("Error on server! Try Again!");
+			}
+		}
+		
+		return $foundDetail;
+	}
 
 
     protected function TenantDeleteAllNullService($deleteKeysValues): bool

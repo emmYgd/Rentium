@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Traits\ModelAbstractions\General\Tenant;
+namespace App\Services\Traits\ModelAbstraction\General\Tenant;
 
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;

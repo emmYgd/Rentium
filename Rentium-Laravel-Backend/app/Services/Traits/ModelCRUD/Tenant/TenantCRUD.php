@@ -2,7 +2,7 @@
 
 namespace App\Services\Traits\ModelCRUD\Tenant;
 
-use App\Models\Tenant;
+use App\Models\Tenant\Tenant;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
@@ -11,15 +11,15 @@ use Illuminate\Support\LazyCollection;
 trait TenantCRUD
 {
 	//CRUD for services:
-	protected function TenantCreateAllService(Request | array $paramsToBeSaved): bool
+	protected function TenantCreateAllService(Request | array $paramsToBeSaved): Tenant //bool
 	{
-		$createModel = Tenant::create($paramsToBeSaved);
-		if($createModel === null)
+		/*$createModel =*/return Tenant::create($paramsToBeSaved);
+		/*if(!$createModel)
         {
             return false;
-        }
+        }*/
         
-        return true;	
+        //return true;
 	}
 
 

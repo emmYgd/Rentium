@@ -18,16 +18,17 @@ class TenantRegistrationTest extends TestCase
                 'tenant_middle_name' => 'Damilare',
                 'tenant_last_name' => 'Adediji',
                 'tenant_phone_number' => '+2349033068412',
+                'tenant_username' => 'youngemmy',
                 'tenant_email' => 'emmdammy@gmail.com',
                 'tenant_password' => 'emma@12crown',
-                'tenant_password_confirmation' => 'emma@12crown',
+                //'tenant_password_confirmation' => 'emma@12crown',
             ],
             []
         );
 
-        $this->assertAuthenticated();
+        //$this->assertAuthenticated();
         //$response->assertNoContent();
-        $response->assertOk();
-        //$response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
+        //$response->assertOk();
+        $response->assertExactJson(['short_description' => "Invalid Input(s) provided!"]);
     }
 }

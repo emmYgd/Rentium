@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Traits\ModelAbstraction\General;
+namespace App\Services\Traits\ModelAbstraction\General\Tenant ;
 
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;

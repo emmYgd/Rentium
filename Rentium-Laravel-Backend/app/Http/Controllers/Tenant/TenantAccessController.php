@@ -11,7 +11,7 @@ use App\Http\Validators\Tenant\TenantAccessRequestRules;
 use App\Services\Interfaces\Tenant\TenantAccessInterface;
 use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
 
-//use App\Services\Traits\ModelAbstraction\General\Tenant\EmailVerificationNotificationAbstraction;
+use App\Services\Traits\ModelAbstraction\General\Tenant\EmailVerificationNotificationAbstraction;
 use App\Services\Traits\ModelAbstraction\General\Tenant\VerifyEmailAbstraction;
 use App\Services\Traits\ModelAbstraction\General\Tenant\PasswordResetLinkAbstraction;
 use App\Services\Traits\ModelAbstraction\General\Tenant\NewPasswordAbstraction;
@@ -37,11 +37,11 @@ final class TenantAccessController extends Controller implements TenantAccessInt
     public function __construct()
     {
         //initialize Tenant Object:
-        //private $Tenant = new Tenant;
+        //public $Tenant = new Tenant;
     }
     
 
-    private function Register(Request $request): JsonResponse 
+    public function Register(Request $request): JsonResponse 
     {
         $status = array();
         try
@@ -54,15 +54,15 @@ final class TenantAccessController extends Controller implements TenantAccessInt
 
             if($validator?->fails())
             {
-                //throw Exception:
-                throw new Exception("Invalid Input(s) provided!");
+                //throw \Exception:
+                throw new \Exception("Invalid Input(s) Provided!");
             }
 
             //pass the validated value to the Model Abstraction Service: 
             $detail_was_partially_saved = $this?->TenantRegisterService($request);
             if(!$detail_was_partially_saved)
             {
-                throw new Exception("Your detail could not be registered. Please try again!"); 
+                throw new \Exception("Your detail could not be registered. Please try again!"); 
             }
 
             //since password can't be saved through mass assignment, so save specific:
@@ -82,7 +82,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
 
             $pass_id_were_saved = $this?->TenantUpdateSpecificService($queryKeysValues, $newKeysValues);
 
-            if(!$pass_id_were_saved)
+            /*if(!$pass_id_were_saved)
             {
                 //delete the formerly saved data if password and id are not saved:
                 $deleteKeysValues = [
@@ -92,8 +92,8 @@ final class TenantAccessController extends Controller implements TenantAccessInt
     
                 if($partially_saved_data_was_deleted)
                 {
-                    //then throw new Exception:
-                    throw new Exception("Your details could not be registered. Please try again!"); 
+                    //then throw new \Exception:
+                    throw new \Exception("Your details could not be registered. Please try again!"); 
                 } 
                 //else:
                     //leave it to the middleware to Delete All null before each request
@@ -110,18 +110,19 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                 //delete all records of this tenant:
                 $deleteKeysValues = ['tenant_email' => $request?->tenant_email];
                 $this?->TenantDeleteSpecificService($deleteKeysValues);
-                //throw Exception:
-                throw new Exception("Verification Request Mail wasn't sent successfully!");
-            }
+                //throw \Exception:
+                throw new \Exception("Verification Request Mail wasn't sent successfully!");
+            }*/
 
             $status = [
                 'code' => 1,
                 'serverStatus' => 'RegisterSuccess!',
                 'short_description' => 'E-mail Verification Link Sent. Please Verify your E-mail to continue!',
-                'verify_link' => $verify_link_was_sent
+                //'verify_link' => $verify_link_was_sent
+                '$detail_was_partially_saved' => $detail_was_partially_saved
             ];
         }
-        catch(Exception $ex)
+        catch(\Exception $ex)
         {
             //warnings for sql repetititive input(s)s attempts in db
             /*$duplicationWarning1 = "Integrity constraint violation";
@@ -134,7 +135,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                 'short_description' => $ex?->getMessage()
             ];
 
-            $str_contains_first_warning = str_contains($status['short_description'], $duplicationWarning1);
+            $str_contains_first_warning = str_contains($status['short_description'], $duplicationWarning);
             //$str_contains_second_warning = str_contains($status['short_description'], $duplicationWarning2);
             //$str_contains_third_warning = str_contains($status['short_description'], $duplicationWarning3);
             if( 
@@ -165,7 +166,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                 $verify_state_was_changed = $this?->TenantChangeVerifiedState($verify);
                 if(!$verify_state_was_changed)
                 {
-                    throw new Exception("Tenant Email was not verified!");
+                    throw new \Exception("Tenant Email was not verified!");
                 }
     
                 $status = [
@@ -185,7 +186,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
             }
 
         }
-        catch(Exception $ex)
+        catch(\Exception $ex)
         {
             $status = [
                 'code' => 0,
@@ -202,7 +203,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
     }
 
 
-    private function LoginDashboard(Request $request): JsonResponse
+    public function LoginDashboard(Request $request): JsonResponse
     {
         $status = array();
 
@@ -216,13 +217,13 @@ final class TenantAccessController extends Controller implements TenantAccessInt
 
             if($validator?->fails())
             {
-                throw new Exception("Invalid Input(s) provided!");
+                throw new \Exception("Invalid Input(s) provided!");
             }
 
             $detailFound = $this?->TenantAuthenticateService($request);
             if(!$detailFound)
             {
-                throw new Exception("Failed login attempt. Invalid Email, Username or Password Provided!");
+                throw new \Exception("Failed login attempt. Invalid Email, Username or Password Provided!");
             }
 
             //now start to prepare to update login status:
@@ -240,7 +241,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
 
             if(!$change_login_status)
             {
-                throw new Exception("Failed to update login status. Please try again!");
+                throw new \Exception("Failed to update login status. Please try again!");
             }
 
             //After logged in state was set, start generating the Bearer token for Authorization Header...
@@ -262,7 +263,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
             ];
 
         }
-        catch(Exception $ex)
+        catch(\Exception $ex)
         {
             $status = [
                 'code' => 0,
@@ -292,7 +293,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
   
              if($validator?->fails())
              {
-                 throw new Exception("Invalid Input provided!");
+                 throw new \Exception("Invalid Input provided!");
              }
  
              //Get this tenant unique_tenant_id:
@@ -309,8 +310,8 @@ final class TenantAccessController extends Controller implements TenantAccessInt
  
              if(!$pass_reset_link_was_sent)
              {
-                 //throw Exception:
-                 throw new Exception("Password Reset Link was not sent!");
+                 //throw \Exception:
+                 throw new \Exception("Password Reset Link was not sent!");
              }
              $status = [
                  'code' => 1,
@@ -318,7 +319,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                  'pass_reset_link' =>  $pass_reset_link_was_sent
              ];
          }
-         catch(Exception $ex)
+         catch(\Exception $ex)
          {
              $status = [
                  'code' => 0,
@@ -346,7 +347,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
  
              if(!$confirm_verify_state)
              {
-                throw new LogicException("You can change your password only after your email has been verified! Please verify your email now to continue!");
+                throw new Logic\Exception("You can change your password only after your email has been verified! Please verify your email now to continue!");
              }
  
              //After this, return all both the tenant unique id and sanctum token (for Auth header):
@@ -370,7 +371,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
              ];
      
          }
-         catch(Exception $ex)
+         catch(\Exception $ex)
          {
             $status = [
                  'code' => 0,
@@ -402,14 +403,14 @@ final class TenantAccessController extends Controller implements TenantAccessInt
  
              if($validator?->fails())
              {
-                 throw new Exception("Invalid Input provided!");
+                 throw new \Exception("Invalid Input provided!");
              }
  
              $password_was_updated = $this?->TenantUpdatePasswordService($request);
  
              if(!$password_was_updated)
              {
-                 throw new Exception("Password could not be changed!");
+                 throw new \Exception("Password could not be changed!");
              }
  
              $status = [
@@ -418,7 +419,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
              ];
  
          }
-         catch(Exception $ex)
+         catch(\Exception $ex)
          {
              $status = [
                  'code' => 0,
@@ -433,7 +434,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
      }    
     
 
-    private function Logout(Request $request):  JsonResponse
+    public function Logout(Request $request):  JsonResponse
     {
         $status = array();
 
@@ -447,13 +448,13 @@ final class TenantAccessController extends Controller implements TenantAccessInt
 
             if($validator?->fails())
             {
-                throw new Exception("Access denied, not logged in!");
+                throw new \Exception("Access denied, not logged in!");
             }
 
             $has_logged_out = $this?->TenantLogoutService($request);
             if(!$has_logged_out/*false*/)
             {
-                throw new Exception("Not logged out yet!");
+                throw new \Exception("Not logged out yet!");
             }
 
             $status = [
@@ -461,7 +462,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                 'serverStatus' => 'LoggedOut!',
             ];
         }
-        catch(Exception $ex)
+        catch(\Exception $ex)
         {
             $status = [
                 'code' => 0,

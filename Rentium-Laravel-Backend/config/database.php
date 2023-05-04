@@ -148,4 +148,6 @@ return [
 
     ],
 
+    'debug' => true,
+
 ];

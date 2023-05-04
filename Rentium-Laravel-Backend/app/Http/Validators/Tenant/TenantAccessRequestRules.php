@@ -13,11 +13,11 @@ trait TenantAccessRequestRules
             'tenant_last_name' => 'required | string',
             'tenant_phone_number' => 'required | string',
 
-            'tenant_username' => 'nullable | string | different:tenant_email',
+            /*'tenant_username' => 'nullable | string | different:tenant_email',
             'tenant_email' => 'required | string | email | different:tenant_password',
-            'tenant_password' => 'required | string | alpha_num | min:5 | max:15 | different:tenant_phone_number',
-            
-            'tenant_current_ country' => 'nullable | string | different:tenant_current_state',
+            'tenant_password' => 'required | string | alpha_num | min:5 | max:15 | different:tenant_email,tenant_username,tenant_phone_number',
+
+            /*'tenant_current_country' => 'nullable | string | different:tenant_current_state',
             'tenant_current_state'=> 'nullable | string | different:tenant_country,tenant_current_city_or_town',
             'tenant_current_city_or_town' => 'nullable | string | different:tenant_country,tenant_current_state',
             'tenant_current_address' => 'nullable | string | different:tenant_country,tenant_current_state',
@@ -28,7 +28,7 @@ trait TenantAccessRequestRules
 
             'tenant_profession' => 'nullable | string',
             'tenant_got_pet' => 'nullable | bool',
-            'pet_type' => 'nullable | json', //e.g.: Pets: {'Dogs' : 2, 'Cats': 1} 
+            'pet_type' => 'nullable | json', //e.g.: Pets: {'Dogs' : 2, 'Cats': 1} */
         ];
 
         return $rules;

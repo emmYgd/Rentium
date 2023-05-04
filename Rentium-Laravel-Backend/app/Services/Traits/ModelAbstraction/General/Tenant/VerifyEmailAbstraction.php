@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Services\Traits\ModelAbstractions\General\Tenant;
+namespace App\Services\Traits\ModelAbstraction\General\Tenant;
 
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use App\Services\Traits\ModelAbstractions\Tenant\TenantAccessAbstraction;
+
+use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
 
 trait VerifyEmailAbstraction 
 {

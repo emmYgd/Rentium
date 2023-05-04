@@ -27,7 +27,7 @@ return new class extends Migration
             $table?->string('landlord_email')?->unique();
             $table?->string('landlord_phone_number')?->nullable()?->unique();
             //it cannot be filled by mass assignment:
-            $table?->string('password')?->unique();
+            $table?->string('landlord_password')?->unique();
 
             $table?->string('landlord_current_country')?->nullable();
             $table?->string('landlord_current_state')?->nullable();

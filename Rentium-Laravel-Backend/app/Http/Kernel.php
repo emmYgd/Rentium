@@ -62,7 +62,7 @@ class Kernel extends HttpKernel
     protected $middlewareAliases = [
         //For Tenants:
         'TenantEnsureLogoutState' => \App\Http\Middleware\Tenant\TenantEnsureLogoutState::class,
-        'TenantCleanNullRecords' =>  \App\Http\Middleware\Tenant\TenantDeleteAllNull::class,
+        'TenantCleanNullRecords' =>  \App\Http\Middleware\Tenant\TenantDeleteAllNullPassAndIDRecords::class,
         'TenantConfirmLoginState' => \App\Http\Middleware\Tenant\TenantConfirmLoginState::class,
         'TenantConfirmVerifyState' => \App\Http\Middleware\Tenant\TenantConfirmVerifyState::class,
         'DestroyTokenAfterLogout' => \App\Http\Middleware\Tenant\DestroyTokenAfterLogout::class,

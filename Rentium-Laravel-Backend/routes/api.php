@@ -79,7 +79,7 @@ Route::prefix("v1/tenant/")->group(function()
 
 		//all housefetchs to allow for frontend complex search by the JS dev:
 		Route::get("fetch/available/propertys/by/category", [
-			"as" => "fetch.all.propertys",
+			"as" => "tenant.fetch.all.propertys",
 			//"middleware" => "init",
 			"uses" => "{$common_house_fetch_controller_url}@FetchAllHousingDetailsByCategory"
 		]);
@@ -87,7 +87,7 @@ Route::prefix("v1/tenant/")->group(function()
 		/*housefetchs search by specific category, the search here is just simple one-keyword search, 
 		the JS frontend can perform most of the complex queries:*/
 		Route::get("fetch/each/property/details/", [
-			"as" => "fetch.each.property",
+			"as" => "tenant.fetch.each.property",
 			//"middleware" => "init",
 			"uses" => "{$common_house_fetch_controller_url}@FetchEachHousingDetails"
 		]);	
@@ -121,7 +121,7 @@ Route::prefix("v1/tenant/")->group(function()
 			]);
 
 			Route::post("fetch/all/own/requests/made", [
-				"as" => "tenant.fetch.all.requests", 
+				"as" => "tenant.fetch.all.own.requests", 
 				//"middleware" => "",
     			"uses" => "{$common_house_fetch_controller_url}@SearchAllPropertyRequests"
 			]);
@@ -156,7 +156,7 @@ Route::prefix("v1/tenant/")->group(function()
 			]);
 
 			Route::post("delete/each/property/request", [
-				"as" => "landlord.delete.each.property.request",
+				"as" => "tenant.delete.each.property.request",
 				//"middleware" => "init",
 				"uses" => "{$common_house_action_controller_url}@DeleteEachPropertyRequest"
 			]);
@@ -355,7 +355,7 @@ Route::prefix("v1/tenant/")->group(function()
 				]);
 
 				Route::get("get/referral/bonus", [
-					"as" => "tenant.generate.referral.link",
+					"as" => "tenant.get.referral.bonus",
 					//"middleware" => "init",
 					"uses" => "{$common_referral_controller_url}@GetReferralBonus"
 				]);
@@ -555,7 +555,7 @@ Route::prefix("v1/landlord/")->group(function()
 			]);
 			
 			Route::patch("reject/or/approve/property/request/", [
-				"as" => "reject.approve.property.request",
+				"as" => "landlord.reject.or.approve.property.request",
 				//"middleware" => "init",
 				"uses" => "{$common_house_action_controller_url}@ApproveRejectTenantRequests"
 			]);
@@ -674,8 +674,8 @@ Route::prefix("v1/landlord/")->group(function()
 				"uses" => "{$common_comments_ratings_controller_url}@ViewOtherLandlordsCommentsRatingsOnLandlord"
 			]);
 
-			Route::get("view/others/landlords/comments/ratings", [
-				"as" => "landlord.view.other.landlords.comments.ratings",
+			Route::get("view/all/own/tenants/comments/ratings", [
+				"as" => "landlord.view.own.tenants.comments.ratings",
 				//"middleware" => "init",
 				"uses" => "{$common_comments_ratings_controller_url}@ViewOwnTenantCommentsRatings"
 			]);
@@ -706,8 +706,14 @@ Route::prefix("v1/landlord/")->group(function()
 				"uses" => "{$common_payment_execution_controller_url}@MakeWithdrawalRequest"
 			]);
 
-			Route::post("make/withdrawal/request", [
-				"as" => "landlord.make.withdrawal.request",
+			Route::post("view/all/withdrawal/requests/summary", [
+				"as" => "landlord.view.all.withdrawal.requests",
+				//"middleware" => "init",
+				"uses" => "{$common_payment_execution_controller_url}@MakeWithdrawalRequest"
+			]);
+
+			Route::post("view/each/withdrawal/request", [
+				"as" => "landlord.view.each.withdrawal.request",
 				//"middleware" => "init",
 				"uses" => "{$common_payment_execution_controller_url}@MakeWithdrawalRequest"
 			]);
@@ -761,31 +767,7 @@ Route::prefix("v1/landlord/")->group(function()
 					//"middleware" => "init",
 					"uses" => "{$common_contact_controller_url}@ReadAllSentMessages"
 				]);
-			});
-
-			Route::prefix("referral/")->group(function() 
-			{
-				$common_referral_controller_url = "App\Http\Controllers\Landlord\LandlordSocialReferralController";
-
-				Route::post("generate/unique/referral/link", [
-					"as" => "landlord.generate.referral.link",
-					//"middleware" => "init",
-					"uses" => "{$common_referral_controller_url}@GenerateUniqueReferralLink"
-				]);
-
-				Route::get("get/referral/bonus", [
-					"as" => "landlord.generate.referral.link",
-					//"middleware" => "init",
-					"uses" => "{$common_referral_controller_url}@GetReferralBonus"
-				]);
-
-				Route::patch("use/referral/link", [
-					"as" => "landlord.use.referral.link",
-					//"middleware" => "init",
-					"uses" => "{$common_referral_controller_url}@UseReferralLink"
-				]);
-			});
-		
+			});		
 		});
 	});	
 	
@@ -912,6 +894,13 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 				"uses" => "{$common_admin_action_controller_url}@ActivateLandlord"
 			]);
 
+			Route::put("activate/each/banned/tenant", [
+				"as" => "admin.activate.banned.tenant",
+				//"middleware" => "init",
+				"uses" => "{$common_admin_action_controller_url}@ActivateTenant"
+			]);
+
+
 		});
 
 		Route::prefix("payment/")->group(function()
@@ -939,14 +928,14 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 				"uses" => "{$common_admin_payment_controller_url}@TotalWithdrawalPayout"
 			]);
 
-			Route::get("fetch/all/unapproved/withdrawal/requests", [
+			/*Route::get("fetch/all/unapproved/withdrawal/requests", [
 				"as" => "admin.fetch.unapproved.withdrawal.requests",
 				//"middleware" => "init",
 				"uses" => "{$common_withdrawal_specific_controller_url}@ViewAllUnApprovedLandlordWithdrawalRequests"
-			]);
+			]);*/
 
-			Route::patch("fetch/all/approved/withdrawal/requests", [
-				"as" => "admin.fetch.approved.withdrawal.requests",
+			Route::patch("fetch/all/withdrawal/requests/by/approval", [
+				"as" => "admin.fetch.withdrawal.requests.by.approval",
 				//"middleware" => "init",
 				"uses" => "{$common_withdrawal_specific_controller_url}@ViewAllApprovedLandlordWithdrawalRequests"
 			]);
@@ -1013,8 +1002,8 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 				]);
 
 				//when a new user clicks the unique referral link generated:
-				Route::get("disable/referral/program", [
-					//"as" => "", 
+				Route::get("change/referral/program/status", [
+					//"as" => "admin.change.referral.program.status", 
 					//"middleware" => "init",
 					"uses" => "{$common_referral_controller_url}@DisableReferralProgram"
 				]);
@@ -1039,13 +1028,13 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 				]);
 
 				Route::get("view/all/landlords/by/highest/sales", [
-					"as" => "admin.view.frequently.bought", 
+					"as" => "admin.view.landlords.by.highest.sales", 
 					//"middleware" => "init",
 					"uses" => "{$common_general_controller_url}@ViewLandlordsByHighestSales"
 				]);	
 
-				Route::post("hint/landlord/on/highest/sales/property/type", [
-					//"as" => "admin.hint.landlord", 
+				Route::post("hint/landlord/on/each/sales/made", [
+					"as" => "admin.hint.landlord", 
 					"uses" => "{$common_general_controller_url}@HintLandlord"
 				]);
 		

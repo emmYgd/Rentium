@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services\Traits\ModelAbstractions\General\Tenant;
+namespace App\Services\Traits\ModelAbstraction\General\Tenant;
 
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Events\Dispatcher;
 
-use App\Services\Traits\ModelAbstractions\Tenant\TenantAccessAbstraction;
+use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
 use App\Services\Traits\Utilities\GenerateLinksService;
 
 use App\Events\Tenant\PassResetLinkWasFormed;
