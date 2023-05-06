@@ -8,16 +8,14 @@ trait TenantAccessRequestRules
     {
 		//set validation rules:
         $rules = [
-            'tenant_first_name' => 'required | string', 
-            'tenant_middle_name' => 'nullable | string',
-            'tenant_last_name' => 'required | string',
+            'tenant_fullname' => 'required | string', 
             'tenant_phone_number' => 'required | string',
 
-            /*'tenant_username' => 'nullable | string | different:tenant_email',
+            /*'tenant_username' => 'nullable | string | different:tenant_email',*/
             'tenant_email' => 'required | string | email | different:tenant_password',
             'tenant_password' => 'required | string | alpha_num | min:5 | max:15 | different:tenant_email,tenant_username,tenant_phone_number',
 
-            /*'tenant_current_country' => 'nullable | string | different:tenant_current_state',
+            'tenant_current_country' => 'nullable | string | different:tenant_current_state',
             'tenant_current_state'=> 'nullable | string | different:tenant_country,tenant_current_city_or_town',
             'tenant_current_city_or_town' => 'nullable | string | different:tenant_country,tenant_current_state',
             'tenant_current_address' => 'nullable | string | different:tenant_country,tenant_current_state',
@@ -39,7 +37,7 @@ trait TenantAccessRequestRules
     {
 		//set validation rules:
         $rules = [
-            'tenant_username_or_email' => 'required | string | different:tenant_password',
+            'tenant_email_or_phone_number' => 'required | string | different:tenant_password',
             'tenant_password' => 'required | string | alpha_num | min:5| max: 15| different:tenant_username_or_email'
         ];
 
@@ -60,7 +58,7 @@ trait TenantAccessRequestRules
     {
         //set validation rules:
         $rules = [
-            'email_or_username' => 'required | different:new_password',
+            'email_or_phone_number' => 'required | different:new_password',
             'new_password' => 'required | alpha_num | min:7 | max:15 | different:email_or_username'
         ];
 

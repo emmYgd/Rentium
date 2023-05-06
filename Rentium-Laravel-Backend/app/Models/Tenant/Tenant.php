@@ -9,18 +9,18 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 
-class Tenant extends Authenticatable //implements MustVerifyEmail//Model
+class Tenant extends Model//Authenticatable //implements MustVerifyEmail//Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'tenants';
 
     //hidden from direct json response:
-    //public $hidden = ['id','unique_tenant_id', 'tenant_password', 'created_at', 'updated_at'];
+    public $hidden = ['id', 'tenant_password', 'created_at', 'updated_at'];
     //public $visible = [];
 
     //guarded from direct mass assignment from request:
-    protected $guarded = [];//'id', 'unique_tenant_id', 'tenant_password', 'created_at', 'updated_at'];
+    protected $guarded = ['id', 'unique_tenant_id', 'tenant_password', 'created_at', 'updated_at'];
     //protected $fillable = [];
 
     /**
