@@ -8,12 +8,10 @@ trait TenantAccessRequestRules
     {
 		//set validation rules:
         $rules = [
-            'tenant_fullname' => 'required | string', 
+            'tenant_full_name' => 'required | string', 
             'tenant_phone_number' => 'required | string',
-
-            /*'tenant_username' => 'nullable | string | different:tenant_email',*/
             'tenant_email' => 'required | string | email | different:tenant_password',
-            'tenant_password' => 'required | string | alpha_num | min:5 | max:15 | different:tenant_email,tenant_username,tenant_phone_number',
+            'tenant_password' => 'required | string | min:5 | max:15 | different:tenant_email,tenant_phone_number',
 
             'tenant_current_country' => 'nullable | string | different:tenant_current_state',
             'tenant_current_state'=> 'nullable | string | different:tenant_country,tenant_current_city_or_town',
@@ -27,6 +25,7 @@ trait TenantAccessRequestRules
             'tenant_profession' => 'nullable | string',
             'tenant_got_pet' => 'nullable | bool',
             'pet_type' => 'nullable | json', //e.g.: Pets: {'Dogs' : 2, 'Cats': 1} */
+
         ];
 
         return $rules;
@@ -44,11 +43,11 @@ trait TenantAccessRequestRules
         return $rules;
     }
 
-
-    protected function confirmLoginStateRules(): array
+    
+    protected function clickVerifyEmailRules(): array
     {
         $rules =  [
-            'unique_tenant_id'=>'required | exists:tenants',
+            'unique_tenant_id'=>'required | string | exists:tenants',
         ];
         return $rules;
     }
@@ -59,7 +58,7 @@ trait TenantAccessRequestRules
         //set validation rules:
         $rules = [
             'email_or_phone_number' => 'required | different:new_password',
-            'new_password' => 'required | alpha_num | min:7 | max:15 | different:email_or_username'
+            'new_password' => 'required | min:7 | max:15 | different:email_or_username'
         ];
 
         return $rules;

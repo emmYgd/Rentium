@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PassResetLinkWasFormed
+final class PassResetLinkWasFormed
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

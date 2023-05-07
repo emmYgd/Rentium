@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 
-class Tenant extends Model//Authenticatable //implements MustVerifyEmail//Model
+class Tenant extends Authenticatable //implements MustVerifyEmail//Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 

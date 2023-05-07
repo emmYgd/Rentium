@@ -82,7 +82,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
 
             $pass_id_were_saved = $this?->TenantUpdateSpecificService($queryKeysValues, $newKeysValues);
 
-            /*if(!$pass_id_were_saved)
+            if(!$pass_id_were_saved)
             {
                 //delete the formerly saved data if password and id are not saved:
                 $deleteKeysValues = [
@@ -100,34 +100,31 @@ final class TenantAccessController extends Controller implements TenantAccessInt
             }
 
             //After all these, send the mail for tenant email verification:
-            $verify_link_was_sent = $this?->SendVerificationReqMail($request, 'tenant.verifications.verify', [
-                'verify' => $uniqueID, 
-                'answer' => 'done',
-            ]);
+            $verify_token_was_sent = $this?->SendVerificationReqMail($request);
             //if it wasn't successful:
-            if(!$verify_link_was_sent)
+            if(!$verify_token_was_sent)
             {
                 //delete all records of this tenant:
-                $deleteKeysValues = ['tenant_email' => $request?->tenant_email];
+                $deleteKeysValues = [
+                    'tenant_email' => $request?->tenant_email
+                ];
                 $this?->TenantDeleteSpecificService($deleteKeysValues);
-                //throw \Exception:
                 throw new \Exception("Verification Request Mail wasn't sent successfully!");
-            }*/
+            }
 
             $status = [
                 'code' => 1,
                 'serverStatus' => 'RegisterSuccess!',
-                'short_description' => 'E-mail Verification Link Sent. Please Verify your E-mail to continue!',
-                //'verify_link' => $verify_link_was_sent
-                '$detail_was_partially_saved' => $detail_was_partially_saved
+                'short_description' => 'E-mail Verification Token was Sent to your email. Please login to Verify!',
+                'verify_token' => $verify_token_was_sent,
             ];
         }
         catch(\Exception $ex)
         {
             //warnings for sql repetititive input(s)s attempts in db
-            /*$duplicationWarning1 = "Integrity constraint violation";
-            $duplicationWarning2 = "SQLSTATE[23000]";*/
-            $duplicationWarning = '1062 Duplicate entry';
+            $duplicationWarning1 = "Integrity constraint violation";
+            $duplicationWarning2 = "SQLSTATE[23000]";
+            $duplicationWarning3 = '1062 Duplicate entry';
 
             $status = [
                 'code' => 0,
@@ -135,14 +132,16 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                 'short_description' => $ex?->getMessage()
             ];
 
-            $str_contains_first_warning = str_contains($status['short_description'], $duplicationWarning);
-            //$str_contains_second_warning = str_contains($status['short_description'], $duplicationWarning2);
-            //$str_contains_third_warning = str_contains($status['short_description'], $duplicationWarning3);
+            $str_contains_first_warning = str_contains($status['short_description'], $duplicationWarning1);
+            $str_contains_second_warning = str_contains($status['short_description'], $duplicationWarning2);
+            $str_contains_third_warning = str_contains($status['short_description'], $duplicationWarning3);
             if( 
-                $str_contains_first_warning //|| $str_contains_second_warning || $str_contains_third_warning
+                $str_contains_first_warning && 
+                $str_contains_second_warning && 
+                $str_contains_third_warning
             )
             {
-                $status['warning'] = 'Either Your Email, Password or Phone Number have been used! Try Another.';
+                $status['warning'] = 'One of your details - Email, Password or Phone Number have been used! Try Another.';
             }
 
             return response()?->json($status, 400);
@@ -151,55 +150,6 @@ final class TenantAccessController extends Controller implements TenantAccessInt
         {*/
             return response()?->json($status, 200);
         /*}*/
-    }
-
-
-    public function VerifyEmail(string $verify, string $answer): JsonResponse
-    {
-        $status = array();
-        try
-        {
-            $confirm_verify_state = $this?->TenantConfirmVerifiedStateViaId($verify);
-
-            if(!$confirm_verify_state)
-            {
-                $verify_state_was_changed = $this?->TenantChangeVerifiedState($verify);
-                if(!$verify_state_was_changed)
-                {
-                    throw new \Exception("Tenant Email was not verified!");
-                }
-    
-                $status = [
-                    'code' => 1,
-                    'serverStatus' => 'VerifiedSuccess!',
-                    'short_description' => 'Redirect to homepage here!'
-                ];
-            }
-            else
-            {
-                 //redirect to home page:
-                 $status = [
-                    'code' => 1,
-                    'serverStatus' => 'VerifiedAlready!',
-                    'short_description' => 'Redirect to homepage here!'
-                ];
-            }
-
-        }
-        catch(\Exception $ex)
-        {
-            $status = [
-                'code' => 0,
-                'serverStatus' => 'VerifiedFailure!',
-                'short_description' => $ex?->getMessage(),
-            ];
-
-            return response()?->json($status, 400);
-        }
-        /*finally
-        {*/
-            return response()?->json($status, 200);
-        //}
     }
 
 
@@ -261,7 +211,6 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                                     tenantUniqueId must be included in the request body while 
                                     tenantAuthToken must be included in the Authorization header as a Bearer Token"
             ];
-
         }
         catch(\Exception $ex)
         {
@@ -277,6 +226,68 @@ final class TenantAccessController extends Controller implements TenantAccessInt
             return response()?->json($status, 200);
         //}
     }
+    
+    //To verify, the user logs into the dashboard:
+    public function VerifyAccount(Request $request): JsonResponse
+    {
+        $status = array();
+
+        //get rules from validator class:
+        $reqRules = $this?->verifyAccountRules();
+
+        //validate here:
+        $validator = Validator::make($request?->all(), $reqRules);
+
+        if($validator?->fails())
+        {
+            throw new \Exception("Access denied! Not a logged in user!");
+        }
+        try
+        {
+            $confirm_verify_state = $this?->TenantConfirmVerifiedStateViaId($verify);
+
+            if(!$confirm_verify_state)
+            {
+                $verify_state_was_changed = $this?->TenantChangeVerifiedState($verify);
+                if(!$verify_state_was_changed)
+                {
+                    throw new \Exception("Tenant Email was not verified!");
+                }
+    
+                $status = [
+                    'code' => 1,
+                    'serverStatus' => 'VerifiedSuccess!',
+                    'short_description' => 'Redirect to homepage here!'
+                ];
+            }
+            else
+            {
+                 //redirect to home page:
+                 $status = [
+                    'code' => 1,
+                    'serverStatus' => 'VerifiedAlready!',
+                    'short_description' => 'Redirect to homepage here!'
+                ];
+            }
+
+        }
+        catch(\Exception $ex)
+        {
+            $status = [
+                'code' => 0,
+                'serverStatus' => 'VerifiedFailure!',
+                'short_description' => $ex?->getMessage(),
+            ];
+
+            return response()?->json($status, 400);
+        }
+        /*finally
+        {*/
+            return response()?->json($status, 200);
+        //}
+    }
+
+
     
 
      //For Guests(Logged out users):

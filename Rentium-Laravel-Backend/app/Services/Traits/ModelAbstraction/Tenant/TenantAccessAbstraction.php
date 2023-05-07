@@ -62,19 +62,19 @@ trait TenantAccessAbstraction
 
 	protected function TenantAuthenticateService(Request $request) : Tenant | null
 	{
-		$tenant_username_or_email = $request?->tenant_username_or_email;
+		$tenant_email_or_phone_number = $request?->tenant_email_or_phone_number;
 		
 		//query KeyValue Pair:
 		//first check for email:
 		$queryKeysValues = [
-			'tenant_email' => $tenant_username_or_email,
+			'tenant_email' => $tenant_email_or_phone_number,
 		];
 		$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
 		if(!$foundDetail)
 		{
 			//query KeyValue Pair:
 			$queryKeysValues = [
-				'tenant_username' => $tenant_username_or_email,
+				'tenant_phone_number' => $tenant_email_or_phone_number,
 			];
 			$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
 			if(!$foundDetail)
@@ -99,26 +99,16 @@ trait TenantAccessAbstraction
 
 	protected function TenantDetailsFoundService(Request $request): Tenant 
 	{
-		$tenant_username_or_email = $request?->tenant_username_or_email;
+		$tenant_email = $request?->tenant_email;
+		$tenant_phone_number = $request?->tenant_phone_number;
 		
 		//query KeyValue Pair:
 		//first check for email:
 		$queryKeysValues = [
-			'tenant_email' => $tenant_username_or_email,
+			'tenant_email' => $tenant_email,
+			'tenant_phone_number' => $tenant_phone_number,
 		];
 		$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
-		if(!$foundDetail)
-		{
-			//query KeyValue Pair:
-			$queryKeysValues = [
-				'tenant_username' => $tenant_username_or_email,
-			];
-			$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
-			if(!$foundDetail)
-			{
-				throw new \Exception("Error on server! Try Again!");
-			}
-		}
 		
 		return $foundDetail;
 	}

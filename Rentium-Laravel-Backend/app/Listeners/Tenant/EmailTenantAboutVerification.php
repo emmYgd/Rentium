@@ -31,8 +31,8 @@ class EmailTenantAboutVerification
     {
         $tenant_request = $event->request;
         $tenant_mail = $event->request->tenant_email;
-        $verify_link = $event->verify_link;
+        $verify_token = $event->verify_token;
         
-        Mail::to($tenant_mail)->send(new SendRegisterVerificationMail($tenant_request, $verify_link));
+        Mail::to($tenant_mail)->send(new SendRegisterVerificationMail($tenant_request, $verify_token));
     }
 }

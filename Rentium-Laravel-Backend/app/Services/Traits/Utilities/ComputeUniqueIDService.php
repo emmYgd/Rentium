@@ -33,15 +33,16 @@ trait ComputeUniqueIDService
 	protected function genUniqueNumericId() : string 
 	{
 		//generate purely random numbers:
-		$strBase = "0123456789@#$%^&*";
+		$strBase = "012345678902468135717253108";
 		$strShuffle1 = str_shuffle($strBase);
 		$strShuffle2 = str_shuffle($strBase);
 
 		$strCombine = $strShuffle1 . $strShuffle2;
 
-		$uniqueID = str_shuffle(substr( $strCombine, 0, 10));
+		$uniqueID = str_shuffle(substr($strCombine, 0, 6));
 		return $uniqueID;
 	}
+	
 
 	//use the laravel uuid feature:
 	protected function genUniqueIDwithUUID(): string
@@ -53,7 +54,7 @@ trait ComputeUniqueIDService
 
 	protected function genUniqueIDwithULID(): string
 	{
-		//use Illuminate's string uuid method:
+		//use Illuminate's string ulid method:
 		$ulid = Str::ulid()->toString();
 		return $ulid;
 	}
