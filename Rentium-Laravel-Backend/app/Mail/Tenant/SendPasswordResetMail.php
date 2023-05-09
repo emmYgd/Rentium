@@ -25,11 +25,11 @@ class SendPasswordResetMail extends Mailable
     public $pass_reset_link;
     public $tenantModel;
 
-    public function __construct(Request $tenant_request, string $pass_reset_link)
+    public function __construct(Request $tenant_request, string $pass_reset_token)
     {
         //init:
         $this->tenant_request = $tenant_request;
-        $this->pass_reset_link = $pass_reset_link;
+        $this->pass_reset_token = $pass_reset_token;
 
         // Use this tenant request object to get the names of the tenant:
         $queryKeysValues = [
@@ -45,7 +45,7 @@ class SendPasswordResetMail extends Mailable
      */
     public function build()
     {
-        return $this?->subject("Password Reset Mail for {$this?->tenantModel?->tenant_first_name} {$this?->tenantModel?->tenant_last_name}")
+        return $this?->subject("Password Reset Mail for {$this?->tenantModel?->tenant_full_name}")
                     ?->view('tenant.password-reset');
     }
 }

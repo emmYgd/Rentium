@@ -8,24 +8,16 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
-/*class TenantPasswordResetTest extends TestCase
+class TenantPasswordResetTest extends TestCase
 {
     //use RefreshDatabase;
 
-    /*public function test_reset_password_link_can_be_requested()
-    {*/
-        /*Notification::fake();
-
-        $user = User::factory()->create();
-
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class);*/
-
-        /*$response = $this->postJson(
-            route('buyer.password.reset.link'), 
+    /*public function test_password_reset_token_mail_can_be_sent()
+    {
+        $response = $this->putJson(
+            route('tenant.send.password.reset.token'), 
             [
-                'buyer_email' => 'emmdammy@gmail.com',
+                'tenant_email' => 'emmdammy@gmail.com',
             ],
             []
         );
@@ -34,8 +26,37 @@ use Tests\TestCase;
         //$response->assertNoContent();
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
-
     }*/
+
+
+    public function test_implement_password_reset()
+    {
+        /*$response = $this->putJson(
+            route('tenant.reset.password'), 
+            [
+                'unique_tenant_id' => '1nxFhatlc0',
+                'tenant_email' => 'emmdammy@gmail.com',
+                'pass_reset_token' => '319837',
+                'tenant_new_password' => 'young@12emmy'
+            ],
+            []
+        );
+
+        //$this->assertAuthenticated();
+        //$response->assertNoContent();
+        //$response->assertOk();
+        $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
+        */
+    }
+        /*Notification::fake();
+
+        $user = User::factory()->create();
+
+        $this->post('/forgot-password', ['email' => $user->email]);
+
+        Notification::assertSentTo($user, ResetPassword::class);*/
+
+        
 
     /*public function test_password_can_be_reset_with_valid_token()
     {
@@ -75,6 +96,7 @@ use Tests\TestCase;
         //$response->assertNoContent();
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
-    }
+    }*/
 
-}*/
+}
+?>

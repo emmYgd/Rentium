@@ -8,24 +8,16 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
-/*class LandlordPasswordResetTest extends TestCase
+class LandlordPasswordResetTest extends TestCase
 {
     //use RefreshDatabase;
 
-    /*public function test_reset_password_link_can_be_requested()
+    public function test_password_reset_token_mail_can_be_sent()
     {
-        /*Notification::fake();
-
-        $user = User::factory()->create();
-
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class);*/
-
-        /*$response = $this->postJson(
-            route('vendor.password.reset.link'), 
+        /*$response = $this->putJson(
+            route('landlord.send.password.reset.token'), 
             [
-                'vendor_email' => 'emmanueladediji@gmail.com',
+                'landlord_email' => 'emmdammy@gmail.com',
             ],
             []
         );
@@ -34,8 +26,37 @@ use Tests\TestCase;
         //$response->assertNoContent();
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
+        */
+    }
 
-    }*/
+
+    public function test_implement_password_reset()
+    {
+        $response = $this->putJson(
+            route('landlord.reset.password'), 
+            [
+                'unique_landlord_id' => 'weZlUrKJam',
+                'landlord_email' => 'emmdammy@gmail.com',
+                'pass_reset_token' => '147517',
+                'landlord_new_password' => 'young@12emmy'
+            ],
+            []
+        );
+
+        //$this->assertAuthenticated();
+        //$response->assertNoContent();
+        //$response->assertOk();
+        $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
+    }
+        /*Notification::fake();
+
+        $user = User::factory()->create();
+
+        $this->post('/forgot-password', ['email' => $user->email]);
+
+        Notification::assertSentTo($user, ResetPassword::class);*/
+
+        
 
     /*public function test_password_can_be_reset_with_valid_token()
     {
@@ -59,14 +80,14 @@ use Tests\TestCase;
         });*/
 
         /*$response = $this->put(
-            route('vendor.reset.password'), 
+            route('buyer.reset.password'), 
             [
-                'unique_vendor_id' => 'YsBInb80f6',
+                'unique_buyer_id' => 'Jt0AUFGSky',
                 'new_password' => 'Y_emmy@12e_crown',
                 'new_password_confirmation' => 'Y_emmy@12e_crown',
             ],
             [
-                'HTTP_Authorization' => 'Bearer ' . '3|wT9MaJfSy0CFSQi4VYNt1NFLPjHXjGvfihGue8r1',
+                'HTTP_Authorization' => 'Bearer ' . '20|smy72I9llvyAr8ngR5fze7f1HjIOQt1PeWZmKwed',
                 'Accept' => 'application/json'
             ]
         );
@@ -75,6 +96,7 @@ use Tests\TestCase;
         //$response->assertNoContent();
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
-    }
+    }*/
 
-}*/
+}
+?>

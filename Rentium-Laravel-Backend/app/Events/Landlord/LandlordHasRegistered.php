@@ -23,13 +23,13 @@ final class LandlordHasRegistered
      */
 
     public $request;
-    public $verify_link;
+    public $verify_token;
 
-    public function __construct(Request $request, string $verify_link)
+    public function __construct(Request $request, string $verify_token)
     {
         //init variables:
         $this->request = $request;
-        $this->verify_link = $verify_link;
+        $this->verify_token = $verify_token;
     }
 
     /**

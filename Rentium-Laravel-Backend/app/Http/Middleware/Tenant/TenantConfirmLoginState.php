@@ -4,7 +4,7 @@ namespace App\Http\Middleware\Tenant;
 
 use Illuminate\Http\Request;
 
-use App\Services\Traits\ModelAbstractions\Tenant\TenantAccessAbstraction;
+use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
 
 use Closure;
 
@@ -25,10 +25,10 @@ final class TenantConfirmLoginState
 
             if(!$logged_in)
             {
-              throw new Exception("Not logged in yet!");
+              throw new \Exception("Not logged in yet!");
             }
         }
-        catch(Exception $ex)
+        catch(\Exception $ex)
         {
             $status = [
                 'code' => 0,

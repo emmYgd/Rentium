@@ -19,33 +19,33 @@ return new class extends Migration
 
             $table?->boolean('is_logged_in')?->default(false);
 
-            $table?->string('landlord_first_name');
-            $table?->string('landlord_middle_name')?->nullable();
-            $table?->string('landlord_last_name');
-
-            $table?->string('landlord_username')?->unique()?->nullable();
+            $table?->string('landlord_full_name');
+           
             $table?->string('landlord_email')?->unique();
-            $table?->string('landlord_phone_number')?->nullable()?->unique();
+            $table?->boolean('is_email_verified')?->default(false);
+
+            $table->string('verify_token')->unique()->nullable();//this will be purely numeric
+            $table->string('pass_reset_token')->unique()->nullable();//this will be purely numeric
+
+            $table?->string('landlord_phone_number')?->unique()?->unique();
             //it cannot be filled by mass assignment:
-            $table?->string('landlord_password')?->unique();
+            $table?->string('landlord_password')?->unique()?->nullable();
 
             $table?->string('landlord_current_country')?->nullable();
             $table?->string('landlord_current_state')?->nullable();
             $table?->string('landlord_current_city_or_town')?->nullable();
             $table?->string('landlord_current_address')?->nullable()?->unique();
-
-            $table?->string('landlord_religion')?->nullable()?->enum(['Christianity', 'Islam', 'Traditionalist']);;
+            
+            $table?->string('landlord_religion')?->enum(['Christianity', 'Islam', 'Traditionalist'])?->nullable();
             $table?->integer('landlord_age')?->nullable();
-            $table?->string('landlord_marital_status')?->nullable()?->enum(['Single', 'Married']);
+            $table?->string('landlord_marital_status')?->enum(['Single', 'Married'])?->nullable();
             $table?->string('landlord_profession')?->nullable();
 
-            $table?->boolean('landlord_got_pet')?->nullable();
+            $table?->boolean('landlord_got_pet')?->default(false)?->nullable();
             $table?->json('pet_type')?->nullable();
 
-            /*$table?->string('landlord_referral_link')?->unique()?->nullable();
-            $table?->string('landlord_total_referral_bonus')?->nullable();*/
+            $table?->string('landlord_nin')->nullable()->unique();
 
-            
             $table?->timestamps();
         });
     }

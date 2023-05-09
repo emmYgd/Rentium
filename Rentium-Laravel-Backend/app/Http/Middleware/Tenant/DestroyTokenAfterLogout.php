@@ -5,7 +5,7 @@ namespace App\Http\Middleware\Tenant;
 use Illuminate\Http\Request;
 
 use Closure;
-use App\Services\Traits\ModelAbstractions\Tenant\TenantAccessAbstraction;
+use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
 
 final class DestroyTokenAfterLogout
 {
@@ -33,7 +33,7 @@ final class DestroyTokenAfterLogout
 			if(!$tenant_token_was_deleted)
 			{
 				$queryKeysValues = ['unique_tenant_id' => $request?->unique_tenant_id];
-				$newKeysValues = [ 'is_logged_in' => false];
+				$newKeysValues = [ 'is_logged_in' => true];
 
 				//restore this user back to a logged in user:
 				$login_status_was_updated = $this?->TenantUpdateSpecificService($queryKeysValues, $newKeysValues);

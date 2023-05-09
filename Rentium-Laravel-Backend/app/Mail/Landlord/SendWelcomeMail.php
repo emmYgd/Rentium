@@ -34,6 +34,6 @@ class SendWelcomeMail extends Mailable
     public function build()
     {
         return $this->subject("Welcome Mail for {$this->landlord_request->landlord_first_name} {$this->landlord_request->landlord_last_name} ")
-                    ->view('landlord.welcome-greeting');
+                    ->view('landlord.welcome-greeting');//view is inside the resources/views folder...
     }
 }

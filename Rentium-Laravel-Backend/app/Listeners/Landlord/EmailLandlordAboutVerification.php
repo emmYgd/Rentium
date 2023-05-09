@@ -31,8 +31,8 @@ class EmailLandlordAboutVerification
     {
         $landlord_request = $event->request;
         $landlord_mail = $event->request->landlord_email;
-        $verify_link = $event->verify_link;
+        $verify_token = $event->verify_token;
         
-        Mail::to($landlord_mail)->send(new SendRegisterVerificationMail($landlord_request, $verify_link));
+        Mail::to($landlord_mail)->send(new SendRegisterVerificationMail($landlord_request, $verify_token));
     }
 }

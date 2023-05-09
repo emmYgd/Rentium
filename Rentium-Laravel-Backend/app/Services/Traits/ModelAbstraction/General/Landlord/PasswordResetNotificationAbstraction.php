@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Traits\ModelAbstraction\General\Landlord ;
+namespace App\Services\Traits\ModelAbstraction\General\Landlord;
 
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
@@ -11,57 +11,64 @@ use App\Services\Traits\ModelAbstraction\Landlord\LandlordAccessAbstraction;
 use App\Services\Traits\Utilities\ComputeUniqueIDService;
 use App\Services\Traits\Utilities\PassHashVerifyService;
 
-use App\Events\Landlord\LandlordHasRegistered;
+use App\Events\Landlord\PassResetTokenWasFormed;
 
-
-trait EmailVerificationNotificationAbstraction
+trait PasswordResetNotificationAbstraction
 {
     use LandlordAccessAbstraction;
     use ComputeUniqueIDService;
     use PassHashVerifyService;
-    
+
     /**
      * Send a new email verification notification.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    protected function SendVerificationReqMail(Request $request): bool
+
+    protected function LandlordSendPasswordResetMailService(Request $request): bool | string
     {
         //init:
-        //$update_status = false;
+        $update_status = false;
 
         //redirect if landlord is verified:
-        $email_was_verified = $this?->LandlordFoundDetailService($request)?->is_email_verified;
+        $landlord_detail_via_email = $this?->LandlordFoundDetailService($request);
 
-        if(!$email_was_verified) 
+        if(!$landlord_detail_via_email) 
         {
-            // form verification token:
-            //$verify_link = $this->GenerateRegisterVerifyToken($url_title, $other_url_params);
-            $verify_token = $this?->genUniqueNumericId();
+            return false;
+        }
+        //else:
+            // form password reset token:
+            $pass_reset_token = $this?->genUniqueNumericId();
 
             //use event to create and send mailing instance:
-            event(new LandlordHasRegistered($request, $verify_token));
+            event(new PassResetTokenWasFormed($request, $pass_reset_token));
 
             //insert this verification token in the database:
             $queryKeysValues = [
                 'landlord_email' => $request->landlord_email,
-                'landlord_phone_number' => $request->landlord_phone_number,
             ];
             $newKeysValues = [
                 //production:
-                //'verify_token' => $this->CustomHashPassword(verify_token),
+                //'pass_reset_token' => $this->CustomHashPassword($pass_reset_token),
                 //test:
-                'verify_token' => $verify_token,
+                'pass_reset_token' => $pass_reset_token,
             ];
             $landlord_was_updated = $this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
             if(!$landlord_was_updated)
             {
                 return false;
             }
-        }
+
+            //read this landlord's unique id:
+            $unique_landlord_id = $this?->LandlordReadSpecificService($queryKeysValues)->unique_landlord_id;
+            if(!$unique_landlord_id)
+            {
+                return false;
+            }
 
         //redirect()->intended(RouteServiceProvider::HOME);
-        return true;
+        return $unique_landlord_id;
     }
 }

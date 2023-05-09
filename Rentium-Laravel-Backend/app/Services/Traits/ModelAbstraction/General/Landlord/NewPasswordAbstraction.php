@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Traits\ModelAbstractions\General\Landlord;
+namespace App\Services\Traits\ModelAbstraction\General\Landlord;
 
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
@@ -21,32 +21,40 @@ trait NewPasswordAbstraction
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function ResetPassword(Request $request): string
+    protected function LandlordImplementResetPasswordService(Request $request): bool
     {
-        
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($landlord) use ($request) 
-            {
-                $landlord->forceFill([
-                    'password' => $this->CustomHashPassword($request->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+        //get the new password:
+        $landlord_new_password = $request->landlord_new_password;
+        //hash the new pass:
+        $landlord_new_hashed_password = $this->CustomHashPassword($landlord_new_password);
 
-                event(new PasswordReset($landlord));
-            }
-        );
+        //other requests params:
+        $unique_landlord_id = $request->unique_landlord_id;
+        $landlord_email = $request->landlord_email;
+        $pass_reset_token = $request->pass_reset_token;
 
-        if ($status != Password::PASSWORD_RESET) {
-            throw ValidationException::withMessages([
-                'email' => [__($status)],
-            ]);
+        //db queries:
+        $queryKeysValues = [
+            'unique_landlord_id' => $unique_landlord_id,
+            'landlord_email' => $landlord_email,
+            //production:
+           //'pass_reset_token' => $this->CustomHashPassword(pass_reset_token)
+            //test:
+            'pass_reset_token' => $pass_reset_token
+        ];
+
+        //db update:
+        $newKeysValues = [
+            'landlord_password' => $landlord_new_hashed_password,
+        ];
+ 
+        //update:
+        $was_password_updated = $this->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
+        if(!$was_password_updated)
+        {
+            return false;
         }
-
-        //return response()->json(['status' => __($status)]);
-        return __($status);
+        //else:
+            return true;
     }
 }

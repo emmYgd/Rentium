@@ -4,7 +4,7 @@ namespace App\Http\Middleware\Tenant;
 
 use Illuminate\Http\Request;
 
-use App\Services\Traits\ModelAbstractions\Tenant\TenantAccessAbstraction;
+use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
 
 use Closure;
 
@@ -26,14 +26,14 @@ final class TenantEnsureLogoutState
       if($is_logged_in)
       {
         //log user out:
-        $is_logged_out = $this?->TenantLogoutService($request);
-        if(!$is_logged_out)
+        $logout_status_was_ensured = $this?->TenantLogoutService($request);
+        if(!$logout_status_was_ensured)
         {
-          throw new Exception('Could not logout tenant!');
+          throw new \Exception('Could not logout tenant!');
         }
       }
     }
-    catch(Exception $ex)
+    catch(\Exception $ex)
     {
       $status = [
         'code' => 0,

@@ -32,43 +32,35 @@ Route::prefix("v1/tenant/")->group(function()
 			"uses" => "{$common_auth_controller_url}@Register"
 		]);
 
-		Route::get("verifications/{verify}/{answer}", [
-			"as" => "tenant.verifications.verify",
-			"middleware" => [/*"auth",*/"signed", "throttle:6,1"],
-			"uses" => "{$common_auth_controller_url}@VerifyEmail"
-		]);
-	
 		Route::patch("dashboard/login", [
 			"as" => "tenant.login",
-			"middleware" => ["TenantConfirmVerifyState", "TenantConfirmLoginState", "DestroyTokenAfterLogout"],
+			//"middleware" => "",
 			"uses" => "{$common_auth_controller_url}@LoginDashboard"
 		]);
 
-        Route::patch("dashboard/logout", [
+		Route::put("verifications/verify", [
+			"as" => "tenant.verify",
+			"middleware" => ["TenantConfirmLoginState", "throttle:6,1"],
+			"uses" => "{$common_auth_controller_url}@VerifyAccount"
+		]);
+
+        Route::put("dashboard/logout", [
 			"as" => "tenant.logout",
-			"middleware" => ["TenantConfirmVerifyState", "TenantConfirmLoginState", "DestroyTokenAfterLogout", "auth:sanctum", "ability:tenant-crud"],
+			"middleware" => ["TenantConfirmLoginState", "TenantDestroyTokenAfterLogout", "auth:sanctum", "ability:tenant-crud"],
 			"uses" => "{$common_auth_controller_url}@Logout"
         ]);
 
-		//This is only for guests who hasn"t logged in yet: send the password reset link to the user gmail:
-		Route::post("logged-out/send/forgot-password/link", [
-			"as" => "tenant.password.reset.link",
-			"middleware" => "guest",
-			"uses" => "{$common_auth_controller_url}@SendResetPassLink"
+		//This is only for guests: send the password reset link to the tenant gmail:
+		Route::put("guest/send/forgot-password/link", [
+			"as" => "tenant.send.password.reset.token",
+			"middleware" => ["TenantEnsureLogoutState", "guest"],
+			"uses" => "{$common_auth_controller_url}@SendPassordResetToken"
 		]);
 
-        //for logged out user: Reset Passsword 
-        /*This option will be presented to Logged Out users: As this will be outside the dashboard, :*/
-        Route::get("clicked/guest/reset/{reset}/{answer}", [
-            "as" => "guest.reset.password",
-            "middleware" => [/*"auth",*/"signed", "throttle:6,1"],
-            "uses" => "{$common_auth_controller_url}@ClickResetPasswordLink",
-        ]);
-
-		//This option will be presented to the already logged in user: 
-		Route::put("auth/reset/password", [
+		//This option will be presented to the guest: 
+		Route::put("guest/reset/password", [
 			"as" => "tenant.reset.password",
-			"middleware" => ["TenantEnsureLogoutState","DestroyTokenAfterLogout", "auth:sanctum", "ability:tenant-update"],
+			"middleware" => ["TenantEnsureLogoutState", "guest"],
 			"uses" => "{$common_auth_controller_url}@ImplementResetPassword"
 		]);
 	});
@@ -432,45 +424,38 @@ Route::prefix("v1/landlord/")->group(function()
 			"uses" => "{$common_auth_controller_url}@Register"
 		]);
 
-		Route::get("verifications/{verify}/{answer}", [
-			"as" => "landlord.verifications.verify",
-			"middleware" => [/*"auth",*/"signed", "throttle:6,1"],
-			"uses" => "{$common_auth_controller_url}@VerifyEmail"
-		]);
-	
 		Route::patch("dashboard/login", [
 			"as" => "landlord.login",
-			"middleware" => ["LandlordConfirmVerifyState", "LandlordConfirmLoginState", "DestroyTokenAfterLogout"],
+			//"middleware" => "",
 			"uses" => "{$common_auth_controller_url}@LoginDashboard"
 		]);
 
-        Route::patch("dashboard/logout", [
+		Route::put("verifications/verify", [
+			"as" => "landlord.verify",
+			"middleware" => ["LandlordConfirmLoginState", "throttle:6,1", "auth:sanctum", "ability:landlord-crud"],
+			"uses" => "{$common_auth_controller_url}@VerifyAccount"
+		]);
+
+        Route::put("dashboard/logout", [
 			"as" => "landlord.logout",
-			"middleware" => ["LandlordConfirmVerifyState", "LandlordConfirmLoginState", "DestroyTokenAfterLogout", "auth:sanctum", "ability:landlord-crud"],
+			"middleware" => ["LandlordConfirmLoginState", "LandlordDestroyTokenAfterLogout", "auth:sanctum", "ability:landlord-crud"],
 			"uses" => "{$common_auth_controller_url}@Logout"
         ]);
 
-		//This is only for guests who hasn"t logged in yet: send the password reset link to the user gmail:
-		Route::post("logged-out/send/forgot-password/link", [
-			"as" => "landlord.password.reset.link",
-			"middleware" => "guest",
-			"uses" => "{$common_auth_controller_url}@SendResetPassLink"
+		//This is only for guests: send the password reset link to the landlord gmail:
+		Route::put("guest/send/forgot-password/link", [
+			"as" => "landlord.send.password.reset.token",
+			"middleware" => ["LandlordEnsureLogoutState", "guest"],
+			"uses" => "{$common_auth_controller_url}@SendPassordResetToken"
 		]);
 
-        //for logged out user: Reset Passsword 
-        /*This option will be presented to Logged Out users: As this will be outside the dashboard, :*/
-        Route::get("clicked/guest/reset/{reset}/{answer}", [
-            "as" => "guest.reset.password",
-            "middleware" => [/*"auth",*/"signed", "throttle:6,1"],
-            "uses" => "{$common_auth_controller_url}@ClickResetPasswordLink",
-        ]);
-
-		//This option will be presented to the already logged in user: 
-		Route::put("auth/reset/password", [
+		//This option will be presented to the guest: 
+		Route::put("guest/reset/password", [
 			"as" => "landlord.reset.password",
-			"middleware" => ["LandlordEnsureLogoutState","DestroyTokenAfterLogout", "auth:sanctum", "ability:landlord-update"],
+			"middleware" => ["LandlordEnsureLogoutState", "guest"],
 			"uses" => "{$common_auth_controller_url}@ImplementResetPassword"
 		]);
+
 	});
 
 

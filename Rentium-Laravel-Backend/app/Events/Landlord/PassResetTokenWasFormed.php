@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events\Tenant;
+namespace App\Events\Landlord;
 
 use Illuminate\Http\Request;
 
@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-final class PassResetLinkWasFormed
+final class PassResetTokenWasFormed
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -22,13 +22,13 @@ final class PassResetLinkWasFormed
      * @return void
      */
     public $request;
-    public $pass_reset_link;
+    public $pass_reset_token;
 
-    public function __construct(Request $request, string $pass_reset_link)
+    public function __construct(Request $request, string $pass_reset_token)
     {
         //
         $this->request = $request;
-        $this->pass_reset_link = $pass_reset_link;
+        $this->pass_reset_token = $pass_reset_token;
     }
 
     /**

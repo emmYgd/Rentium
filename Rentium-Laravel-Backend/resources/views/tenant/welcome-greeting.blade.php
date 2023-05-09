@@ -31,7 +31,7 @@
         <div class="w3-center">
         <br/><br/>
         <p>
-            <strong> Hello from this side <b>{{$tenant_request->tenant_first_name}} {{$tenant_request->tenant_last_name}}</b>,</strong>
+            <strong> Hello from this side <b>{{$tenant_request->tenant_full_name}}</b>,</strong>
         </p>
 
         <b><hr/></b>
@@ -46,7 +46,7 @@
                 <br/>
                 <!--<strong><hr/></strong>-->
                 <br/>
-                <i class="w3-text-yellow">Please open your verification mail to activate your Wicart account</i>
+                <i class="w3-text-yellow">Please open your verification mail to activate your Rentium account</i>
             </b>
         </p>
 

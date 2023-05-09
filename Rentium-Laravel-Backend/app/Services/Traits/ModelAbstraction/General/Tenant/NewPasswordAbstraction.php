@@ -21,32 +21,40 @@ trait NewPasswordAbstraction
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function ResetPassword(Request $request): string
+    protected function TenantImplementResetPasswordService(Request $request): bool
     {
-        
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($tenant) use ($request) 
-            {
-                $tenant->forceFill([
-                    'password' => $this->CustomHashPassword($request->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+        //get the new password:
+        $tenant_new_password = $request->tenant_new_password;
+        //hash the new pass:
+        $tenant_new_hashed_password = $this->CustomHashPassword($tenant_new_password);
 
-                event(new PasswordReset($tenant));
-            }
-        );
+        //other requests params:
+        $unique_tenant_id = $request->unique_tenant_id;
+        $tenant_email = $request->tenant_email;
+        $pass_reset_token = $request->pass_reset_token;
 
-        if ($status != Password::PASSWORD_RESET) {
-            throw ValidationException::withMessages([
-                'email' => [__($status)],
-            ]);
+        //db queries:
+        $queryKeysValues = [
+            'unique_tenant_id' => $unique_tenant_id,
+            'tenant_email' => $tenant_email,
+             //production:
+           //'pass_reset_token' => $this->CustomHashPassword(pass_reset_token)
+            //test:
+            'pass_reset_token' => $pass_reset_token
+        ];
+
+        //db update:
+        $newKeysValues = [
+            'tenant_password' => $tenant_new_hashed_password,
+        ];
+ 
+        //update:
+        $was_password_updated = $this->TenantUpdateSpecificService($queryKeysValues, $newKeysValues);
+        if(!$was_password_updated)
+        {
+            return false;
         }
-
-        //return response()->json(['status' => __($status)]);
-        return __($status);
+        //else:
+            return true;
     }
 }

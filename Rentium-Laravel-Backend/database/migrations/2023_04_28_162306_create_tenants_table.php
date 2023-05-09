@@ -25,7 +25,8 @@ return new class extends Migration
             $table?->boolean('is_email_verified')?->default(false);
 
             $table->string('verify_token')->unique()->nullable();//this will be purely numeric
-            
+            $table->string('pass_reset_token')->unique()->nullable();//this will be purely numeric
+
             $table?->string('tenant_phone_number')?->unique()?->unique();
             //it cannot be filled by mass assignment:
             $table?->string('tenant_password')?->unique()?->nullable();
@@ -40,8 +41,10 @@ return new class extends Migration
             $table?->string('tenant_marital_status')?->enum(['Single', 'Married'])?->nullable();
             $table?->string('tenant_profession')?->nullable();
 
-            $table?->boolean('tenant_got_pet')?->nullable();
+            $table?->boolean('tenant_got_pet')?->default(false)?->nullable();
             $table?->json('pet_type')?->nullable();
+
+            $table?->string('tenant_nin')->nullable()->unique();
 
             $table?->timestamps();
         });

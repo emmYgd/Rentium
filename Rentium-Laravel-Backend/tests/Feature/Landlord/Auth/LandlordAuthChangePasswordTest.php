@@ -9,7 +9,7 @@ use Tests\TestCase;
 {
     //use RefreshDatabase;
 
-    /*public function test_auth_vendors_can_change_password()
+    /*public function test_auth_landlords_can_change_password()
     {
         $response = $this->putJson(
             route('vendor.change.password'), 

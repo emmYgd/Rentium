@@ -31,16 +31,18 @@
         <div class="w3-center">
         <br/><br/>
         <p>
-            <strong> Hey <b>{{$landlord_request->landlord_first_name}}</b>,</strong>
+            <strong> Hey <b>{{$landlord_request->landlord_full_name}}</b>,</strong>
         </p>
 
         <b><hr/></b>
 
         <p>
-            <b> To continue with us, <a href="{{$verify_link}}"><i class="w3-text-yellow">click here</i></a> to verify your Wicart account or:<br/><br/>
-                Copy and Follow this link on your favourite browser:<br/><br/>
-                <i>{{$verify_link}}</i>
+            <b> To continue with us, Please log into your rentium account and click on verify account:<br/><br/>
+                Copy this token and paste it in the text box provided!:<br/><br/>
+                <i>{{$verify_token}}</i>
             </b>
+            <br/>
+            <b> See you on the other side!</b>
         </p>
 
         <b><hr/></b>

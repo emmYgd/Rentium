@@ -19,13 +19,13 @@ class SendRegisterVerificationMail extends Mailable
      */
 
     public $landlord_request;
-    public $verify_link;
+    public $verify_token;
 
-    public function __construct(Request $landlord_request, string $verify_link)
+    public function __construct(Request $landlord_request, string $verify_token)
     {
         //init:
         $this->landlord_request = $landlord_request;
-        $this->verify_link = $verify_link;
+        $this->verify_token = $verify_token;
     }
 
     /**
@@ -35,7 +35,7 @@ class SendRegisterVerificationMail extends Mailable
      */
     public function build()
     {
-        return $this->subject("Verification Mail for {$this->landlord_request->landlord_first_name} {$this->landlord_request->landlord_last_name} ")
+        return $this->subject("Verification Mail for {$this->landlord_request->landlord_full_name}")
                     ->view('landlord.verification-request');
     }
 }

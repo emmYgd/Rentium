@@ -31,16 +31,18 @@
         <div class="w3-center">
         <br/><br/>
         <p>
-            <strong> Hey <b>{{$landlordModel->landlord_first_name}}</b>,</strong>
+            <strong> Hey <b>{{$landlord_request->landlord_full_name}}</b>,</strong>
         </p>
 
         <b><hr/></b>
 
         <p>
-            <b> To reset your password, <a href="{{$pass_reset_link}}"><i class="w3-text-yellow">click here</i></a> or:<br/><br/>
-                Copy and Follow this link on your favourite browser:<br/><br/>
-                <i>{{$pass_reset_link}}</i>
+            <b> To continue with your password reset, Proceed to the Password Reset page <br/><br/>
+                Supply your intended new password and copy this token and paste it in the token text box provided!:<br/><br/>
+                <i>{{$pass_reset_token}}</i>
             </b>
+            <br/>
+            <b> See you on the other side!</b>
         </p>
 
         <b><hr/></b>

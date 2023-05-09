@@ -25,15 +25,15 @@ class SendPasswordResetMail extends Mailable
     public $pass_reset_link;
     public $landlordModel;
 
-    public function __construct(Request $landlord_request, string $pass_reset_link)
+    public function __construct(Request $landlord_request, string $pass_reset_token)
     {
         //init:
         $this->landlord_request = $landlord_request;
-        $this->pass_reset_link = $pass_reset_link;
+        $this->pass_reset_token = $pass_reset_token;
 
         // Use this landlord request object to get the names of the landlord:
         $queryKeysValues = [
-            'landlord_email' => $landlord_request->landlord_email
+            'landlord_email' => $landlord_request?->landlord_email
         ];
         $this->landlordModel = $this?->LandlordReadSpecificService($queryKeysValues);
     }
@@ -45,7 +45,7 @@ class SendPasswordResetMail extends Mailable
      */
     public function build()
     {
-        return $this->subject("Password Reset Mail for {$this->landlordModel->landlord_first_name} {$this->landlordModel->landlord_last_name}")
-                    ->view('landlord.password-reset');
+        return $this?->subject("Password Reset Mail for {$this?->landlordModel?->landlord_full_name}")
+                    ?->view('landlord.password-reset');
     }
 }

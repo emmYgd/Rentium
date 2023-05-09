@@ -4,9 +4,11 @@ namespace App\Services\Traits\ModelAbstraction\Landlord;
 
 use Illuminate\Http\Request;
 
+use App\Models\Landlord\Landlord;
 use App\Services\Traits\ModelCRUD\Landlord\LandlordCRUD;
 use App\Services\Traits\Utilities\PassHashVerifyService;
 use App\Services\Traits\Utilities\ComputeUniqueIDService;
+
 
 trait LandlordAccessAbstraction
 {	
@@ -15,120 +17,237 @@ trait LandlordAccessAbstraction
 	use ComputeUniqueIDService;
 	use PassHashVerifyService;
 
+
 	protected function LandlordConfirmLoginStateService(Request $request) : bool
 	{
+		//init:
+		$queryKeysValues = array();
+		//$foundDetail = null;
 
-		$queryKeysValues = ['unique_landlord_id' => $request?->unique_landlord_id];
-		$detailsFound = $this?->LandlordReadSpecificService($queryKeysValues);
+		$unique_landlord_id = $request?->unique_landlord_id;
+		$landlord_email = $request?->landlord_email;
+		$landlord_phone_number = $request?->landlord_phone_number;
 
-		//get the login state:
-		$login_status = $detailsFound['is_logged_in'];
+		$landlord_email_or_phone_number = $request?->landlord_email_or_phone_number;
+
+		if($unique_landlord_id)
+		{
+			$queryKeysValues = [
+				'unique_landlord_id' => $unique_landlord_id,
+			];
+		}
+		
+		if($landlord_email)
+		{
+			$queryKeysValues = [
+				'landlord_email' => $landlord_email,
+			];
+		}
+		
+		if($landlord_phone_number)
+		{
+			$queryKeysValues = [
+				'landlord_phone_number' => $landlord_phone_number,
+			];
+		}
+
+		if($landlord_email_or_phone_number)
+		{
+			$queryKeysValues = [
+				'landlord_email' => $landlord_email_or_phone_number
+			];
+			$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				$queryKeysValues = [
+					'landlord_phone_number' => $landlord_email_or_phone_number
+				];
+				$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+				if(!$foundDetail)
+				{
+					return false;
+				}
+			}
+		}
+		
+		$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+		if(!$foundDetail)
+		{
+			return false;
+		}
+
+		//finally, get the login state:
+		$login_status = $foundDetail?->is_logged_in;
 		return $login_status;
 	}
 
+	
 	protected function LandlordLogoutService(Request $request): bool
 	{
-		$queryKeysValues = ['unique_landlord_id' => $request?->unique_landlord_id];
-		$newKeysValues = ['is_logged_in' => false];
-		$has_logged_out = $this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
+		//init:
+		$queryKeysValues = array();
 
-		return $has_logged_out;
+		$unique_landlord_id = $request?->unique_landlord_id;
+		$landlord_email = $request?->landlord_email;
+
+		if($unique_landlord_id)
+		{
+			$queryKeysValues = [
+				'unique_landlord_id' => $unique_landlord_id,
+			];
+		}
+
+		if($landlord_email)
+		{
+			$queryKeysValues = [
+				'landlord_email' => $landlord_email,
+			];
+		}
+
+		$newKeysValues = [
+			'is_logged_in' => false
+		];
+
+		$was_logout_status_ensured = $this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
+
+		return $was_logout_status_ensured;
 	}
+
 
 	protected function LandlordRegisterService(Request $request): bool
 	{
 		$newKeyValues = $request?->all();
 		//create new landlord:
-		$is_details_saved = $this?->LandlordCreateAllService($newKeyValues);
-		return $is_details_saved;
+		$were_details_saved = $this?->LandlordCreateAllService($newKeyValues);
+		return $were_details_saved;
 	}
+
 
 	protected function LandlordDeleteSpecificService($deleteKeysValues): bool
 	{
-		$is_details_deleted = $this?->LandlordDeleteSpecificService($deleteKeysValues);
-		return $is_details_deleted;
+		$were_details_deleted = $this?->LandlordDeleteSpecificService($deleteKeysValues);
+		return $were_details_deleted;
 	}
 
-	protected function LandlordDetailsFoundService(Request $request) : Landlord | null
+
+	protected function LandlordAuthenticateService(Request $request) : Landlord | null
 	{
+		$landlord_email_or_phone_number = $request?->landlord_email_or_phone_number;
+		
+		//query KeyValue Pair:
+		//first check for email:
+		$queryKeysValues = [
+			'landlord_email' => $landlord_email_or_phone_number,
+		];
+		$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+		if(!$foundDetail)
+		{
+			//query KeyValue Pair:
+			$queryKeysValues = [
+				'landlord_phone_number' => $landlord_email_or_phone_number,
+			];
+			$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				throw new \Exception("Failed login attempt. Invalid Email or Phone Number Provided!");
+			}
+		}
+
+		//else: continue with password Auth
+		//verify password against the hashed password in the database:
+        $dbHashedPass = $foundDetail->landlord_password;
+		$requestPass = $request->landlord_password;
+		$was_pass_verified = $this?->CustomVerifyPassword($requestPass, $dbHashedPass);
+		if(!$was_pass_verified)
+		{
+			throw new \Exception("Failed login attempt. Invalid Password Provided!");
+		}
+		//else:
+        return $foundDetail;
+    }
+
+
+	protected function LandlordFoundDetailService(Request $request): Landlord 
+	{
+		//init:
+		$foundDetail = null;
+
+		$unique_landlord_id = $request?->unique_landlord_id;
 		$landlord_email = $request?->landlord_email;
+		
+		//query KeyValue Pair:
 
-        //query KeyValue Pair:
-        $queryKeysValues = ['landlord_email' => $landlord_email];
-        $detailsFound = $this?->LandlordReadSpecificService($queryKeysValues);
-        return $detailsFound;
-    }
+		if($unique_landlord_id)
+		{
+			$queryKeysValues = [
+				'unique_landlord_id' => $unique_landlord_id,
+			];
+			$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+		}
+		
+		if($landlord_email)
+		{
+			$queryKeysValues = [
+				'landlord_email' => $landlord_email
+			];
+			$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+		}
 
-    protected function LandlordTransformPassService(string $reqPass): string
-    {
-    	$returnValueOrState = null;
+		if($unique_landlord_id && $landlord_email)
+		{
+			$queryKeysValues = [
+				'unique_landlord_id' => $unique_landlord_id,
+				'landlord_email' => $landlord_email
+			];
+			$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+		}
 
-    	$firstPass = md5(md5($reqPass));
-    	$secondPass = md5(md5($reqPass));
-    	$finalHashedPass = md5($firstPass . $secondPass);
+		return $foundDetail;
+	}
 
-    	return $finalHashedPass;
-    }
 
     protected function LandlordDeleteAllNullService($deleteKeysValues): bool
     {
     	//get all null valued collections:
-    	$this?->LandlordDeleteSpecificService($deleteKeysValues);
-    	return true;
+    	$were_all_null_deleted = $this?->LandlordDeleteSpecificService($deleteKeysValues);
+    	return $were_all_null_deleted;
     }
+
 
 	protected function LandlordUpdatePasswordService(Request $request): bool
 	{
-		$email_or_username = $request?->input('email_or_username');
-        $new_pass = $request?->input('new_pass');
+		$email_or_username = $request?->email_or_username;
+        $new_pass = $request?->new_password;
 
 		//hash password before save:
         $hashedPass = $this?->HashPassword($new_pass);
 
         //query KeyValue Pair:
-        $queryKeysValues = ['email' => $email_or_username];
+        $queryKeysValues = [
+			'email' => $email_or_username
+		];
 		
-		$newKeysValues = ['password' => $hashedPass];
+		$newKeysValues = [
+			'password' => $hashedPass
+		];
 
 		//attempt at email, then password:
-        $has_updated = $this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
-        if(!$has_updated)
+        $password_was_updated = $this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
+        if(!$password_was_updated)
 		{
-        	$queryKeysValues = ['username' => $email_or_username];	
-        	$this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
-        }
+        	$queryKeysValues = [
+				'username' => $email_or_username
+			];	
+        	$password_was_updated = $this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
+			if(!$password_was_updated)
+			{
+				return false;
+			}
+		}
 
         return true;
 	}
 
-
-	//update each fields without mass assignment: Specific Logic 
-	protected function LandlordUpdateEachService(Request $request): bool
-	{
-		$landlord_id = $request?->landlord_id;
-
-		if($landlord_id !== ""){
-
-			$request = $request?->except('landlord_id');
-
-			foreach($request as $reqKey => $reqValue)
-			{
-				$queryKeysValues = ['landlord_id' => $landlord_id];
-
-				if(is_array($reqValue))
-				{
-					$newKeysValues = [$reqKey => json_encode($reqValue)];
-				}
-				else
-				{
-					$newKeysValues = [$reqKey => $reqValue];
-				}
-				$this?->LandlordUpdateSpecificService($queryKeysValues, $newKeysValues);
-			}
-		}
-		
-		return true;
-	}
 }
 
 ?>

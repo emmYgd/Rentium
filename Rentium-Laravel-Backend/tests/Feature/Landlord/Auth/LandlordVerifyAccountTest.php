@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Auth;
+namespace Tests\Feature\Landlord\Auth;
 
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
@@ -10,13 +10,31 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
-/*class TenantEmailVerificationTest extends TestCase
+class LandlordVerifyAccountTest extends TestCase
 {
-    /*use RefreshDatabase;
+    //use RefreshDatabase;
 
     public function test_email_can_be_verified()
     {
-        $user = User::factory()->create([
+        /*$response = $this->putJson(
+            route('landlord.verify'), 
+            [
+                'unique_landlord_id' => 'weZlUrKJam',
+                'verify_token' => '405801',
+            ],
+            [
+                'HTTP_Authorization' => 'Bearer ' . '3|3i1S6aWmrGbsOqZDdSCfsdbBBVVpopB5p1wjyEFD',
+                'Accept' => 'application/json'
+            ]
+        );
+        
+        //$this->assertAuthenticated();
+        //$response->assertNoContent();
+        //$response->assertOk();
+        $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]); 
+    */
+    }
+        /*$user = User::factory()->create([
             'email_verified_at' => null,
         ]);
 
@@ -33,9 +51,9 @@ use Tests\TestCase;
         Event::assertDispatched(Verified::class);
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
         $response->assertRedirect(config('app.frontend_url').RouteServiceProvider::HOME.'?verified=1');
-    }
+        */
 
-    public function test_email_is_not_verified_with_invalid_hash()
+    /*public function test_email_is_not_verified_with_invalid_hash()
     {
         $user = User::factory()->create([
             'email_verified_at' => null,
@@ -50,5 +68,5 @@ use Tests\TestCase;
         $this->actingAs($user)->get($verificationUrl);
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
-    }
-}*/
+    }*/
+}

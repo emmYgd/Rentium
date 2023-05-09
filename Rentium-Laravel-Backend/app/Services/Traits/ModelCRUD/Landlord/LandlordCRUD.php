@@ -2,7 +2,8 @@
 
 namespace App\Services\Traits\ModelCRUD\Landlord;
 
-use App\Models\Landlord;
+
+use App\Models\Landlord\Landlord;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
@@ -14,13 +15,14 @@ trait LandlordCRUD
 	protected function LandlordCreateAllService(array $paramsToBeSaved): bool
 	{ 
 		$createModel = Landlord::create($paramsToBeSaved);
-		if($createModel === null)
+		if(!$createModel)
         {
             return false;
         }
         
         return true;		
 	}
+
 
 	protected function LandlordReadSpecificService(array $queryKeysValues): Landlord | null
 	{	
@@ -42,6 +44,14 @@ trait LandlordCRUD
 		return $allLandlordPosted;
 	}
 
+	protected function LandlordReadSpecificAllTestNullService(string $queryParam): LazyCollection
+	{
+		$readSpecificAllModel = Landlord::where($queryParam, "!==", null)
+										->where($queryParam, "!==", "")
+										->lazy();
+		return $readSpecificAllModel;
+	}
+
 
 	protected function LandlordReadSpecificAllService(array $queryKeysValues): Collection
 	{
@@ -52,14 +62,22 @@ trait LandlordCRUD
 
 	protected function LandlordUpdateSpecificService(array $queryKeysValues, array $newKeysValues): bool
 	{
-		Landlord::where($queryKeysValues)->update($newKeysValues);
+		$landlordModelUpdate = Landlord::where($queryKeysValues)->update($newKeysValues);
+		if(!$landlordModelUpdate)
+		{
+			return false;
+		}
 		return true;
 	}
 
 
 	protected function LandlordDeleteSpecificService(array $deleteKeysValues): bool
 	{
-		Landlord::where($deleteKeysValues)->delete();
+		$landlordModelDelete = Landlord::where($deleteKeysValues)->delete();
+		if(!$landlordModelDelete)
+		{
+			return false;
+		}
 		return true;
 	}
 

@@ -5,7 +5,7 @@ namespace App\Http\Middleware\Landlord;
 use Illuminate\Http\Request;
 
 use Closure;
-use App\Services\Traits\ModelAbstractions\Landlord\LandlordAccessAbstraction;
+use App\Services\Traits\ModelAbstraction\Landlord\LandlordAccessAbstraction;
 
 final class DestroyTokenAfterLogout
 {
@@ -32,9 +32,7 @@ final class DestroyTokenAfterLogout
         	$landlord_token_was_deleted = $landlordObject?->tokens()?->where($queryKeysValues)?->delete();
 			if(!$landlord_token_was_deleted)
 			{
-				$queryKeysValues = [
-					'unique_landlord_id' => $request?->unique_landlord_id
-				];
+				$queryKeysValues = ['unique_landlord_id' => $request?->unique_landlord_id];
 				$newKeysValues = [ 'is_logged_in' => true];
 
 				//restore this user back to a logged in user:

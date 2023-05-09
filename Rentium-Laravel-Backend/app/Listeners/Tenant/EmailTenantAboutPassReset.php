@@ -6,11 +6,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 
-use App\Events\Tenant\PassResetLinkWasFormed;
+use App\Events\Tenant\PassResetTokenWasFormed;
 use App\Mail\Tenant\SendPasswordResetMail; 
 
 
-class EmailTenantAboutReset
+class EmailTenantAboutPassReset
 {
     /**
      * Create the event listener.
@@ -25,16 +25,16 @@ class EmailTenantAboutReset
     /**
      * Handle the event.
      *
-     * @param  \App\Events\Tenant\PassResetLinkSent  $event
+     * @param  \App\Events\Tenant\PassResetTokenSent  $event
      * @return void
      */
-    public function handle(PassResetLinkWasFormed $event)
+    public function handle(PassResetTokenWasFormed $event)
     {
         $tenant_request = $event->request;
         $tenant_mail = $event->request->tenant_email;
-        $pass_reset_link = $event->pass_reset_link;
+        $pass_reset_token = $event->pass_reset_token;
 
         //Invoke mail object:
-        Mail::to($tenant_mail)->send(new SendPasswordResetMail($tenant_request, $pass_reset_link));
+        Mail::to($tenant_mail)->send(new SendPasswordResetMail($tenant_request, $pass_reset_token));
     }
 }

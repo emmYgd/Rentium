@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Landlord extends Authenticatable //implements MustVerifyEmail//Model
 {
@@ -17,7 +16,7 @@ class Landlord extends Authenticatable //implements MustVerifyEmail//Model
     protected $table = 'landlords';
 
     //hidden from direct json response:
-    public $hidden = ['id','unique_landlord_id', 'landlord_password', 'created_at', 'updated_at'];
+    public $hidden = ['id', 'landlord_password', 'created_at', 'updated_at'];
     //public $visible = [];
 
     //guarded from direct mass assignment from request:
@@ -35,15 +34,4 @@ class Landlord extends Authenticatable //implements MustVerifyEmail//Model
         'is_email_verified' => 'bool',
         //'email_verified_at' => 'datetime',
     ];
-
-     //Relationship:
-     public function properties(): HasMany
-     {
-        return $this->hasMany(
-            $related=App\Models\Property\Property::class,
-            $foreignKey='unique_property_id',
-            $localKey='unique_property_id'
-        );
-     }
-
 }

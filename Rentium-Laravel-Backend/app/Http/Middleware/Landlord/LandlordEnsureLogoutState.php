@@ -4,7 +4,7 @@ namespace App\Http\Middleware\Landlord;
 
 use Illuminate\Http\Request;
 
-use App\Services\Traits\ModelAbstractions\Landlord\LandlordAccessAbstraction;
+use App\Services\Traits\ModelAbstraction\Landlord\LandlordAccessAbstraction;
 
 use Closure;
 
@@ -21,19 +21,19 @@ final class LandlordEnsureLogoutState
     //Before:
     try
     {
-      $logged_in = $this?->LandlordConfirmLoginStateService($request);
+      $is_logged_in = $this?->LandlordConfirmLoginStateService($request);
 
-      if($logged_in)
+      if($is_logged_in)
       {
         //log user out:
-        $is_logged_out = $this?->LandlordLogoutService($request);
-        if(!$is_logged_out)
+        $logout_status_was_ensured = $this?->LandlordLogoutService($request);
+        if(!$logout_status_was_ensured)
         {
-          throw new Exception('Could not logout landlord before password reset!');
+          throw new \Exception('Could not logout landlord!');
         }
       }
     }
-    catch(Exception $ex)
+    catch(\Exception $ex)
     {
       $status = [
         'code' => 0,

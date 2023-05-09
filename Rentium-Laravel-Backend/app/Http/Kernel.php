@@ -65,7 +65,7 @@ class Kernel extends HttpKernel
         'TenantCleanNullRecords' =>  \App\Http\Middleware\Tenant\TenantDeleteAllNullPassAndIDRecords::class,
         'TenantConfirmLoginState' => \App\Http\Middleware\Tenant\TenantConfirmLoginState::class,
         'TenantConfirmVerifyState' => \App\Http\Middleware\Tenant\TenantConfirmVerifyState::class,
-        'DestroyTokenAfterLogout' => \App\Http\Middleware\Tenant\DestroyTokenAfterLogout::class,
+        'TenantDestroyTokenAfterLogout' => \App\Http\Middleware\Tenant\DestroyTokenAfterLogout::class,
         //For Carts
         //'DeleteEmptyCarts' => \App\Http\Middleware\General\DeleteEmptyCarts::class,
         //'CartEnsureNotCleared' => \App\Http\Middleware\General\CartEnsureNotCleared::class,
@@ -77,10 +77,10 @@ class Kernel extends HttpKernel
 
         //For Landlords:
         'LandlordEnsureLogoutState' => \App\Http\Middleware\Landlord\LandlordEnsureLogoutState::class,
-        'LandlordCleanNullRecords' =>  \App\Http\Middleware\Landlord\LandlordDeleteAllNull::class,
+        'LandlordCleanNullRecords' =>  \App\Http\Middleware\Landlord\LandlordDeleteAllNullPassAndIDRecords::class,
         'LandlordConfirmLoginState' => \App\Http\Middleware\Landlord\LandlordConfirmLoginState::class,
         'LandlordConfirmVerifyState' => \App\Http\Middleware\Landlord\LandlordConfirmVerifyState::class,
-        'DestroyTokenAfterLogout' => \App\Http\Middleware\Landlord\DestroyTokenAfterLogout::class,
+        'LandlordDestroyTokenAfterLogout' => \App\Http\Middleware\Landlord\DestroyTokenAfterLogout::class,
 
         //For Admin:
         'AdminCreateBoss' => \App\Http\Middleware\Admin\AdminCreateBoss::class,
@@ -88,7 +88,7 @@ class Kernel extends HttpKernel
         'AdminCleanNullRecords' =>  \App\Http\Middleware\Admin\AdminDeleteAllNull::class,
         'AdminConfirmLoginState' => \App\Http\Middleware\Admin\AdminConfirmLoginState::class,
         'AdminConfirmVerifyState' => \App\Http\Middleware\Admin\AdminConfirmVerifyState::class,
-        'DestroyTokenAfterLogout' => \App\Http\Middleware\Admin\DestroyTokenAfterLogout::class,
+        'AdminDestroyTokenAfterLogout' => \App\Http\Middleware\Admin\DestroyTokenAfterLogout::class,
 
         //Check for sanctum auth token abilities:
         'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,

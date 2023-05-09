@@ -9,8 +9,7 @@ interface TenantAccessInterface
 	public function Register(Request $request): JsonResponse;
 	public function LoginDashboard(Request $request): JsonResponse;
 	public function VerifyAccount(Request $request): JsonResponse;
-	public function SendResetPassLink(Request $request): JsonResponse;
-	public function ClickResetPasswordLink(string $reset, string $answer): JsonResponse;
+	public function SendPassordResetToken(Request $request): JsonResponse;
 	public function ImplementResetPassword(Request $request): JsonResponse;
 	public function Logout(Request $request):  JsonResponse;
 }

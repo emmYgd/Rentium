@@ -13,7 +13,7 @@ use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
 
 use App\Services\Traits\ModelAbstraction\General\Tenant\EmailVerificationNotificationAbstraction;
 use App\Services\Traits\ModelAbstraction\General\Tenant\VerifyEmailAbstraction;
-use App\Services\Traits\ModelAbstraction\General\Tenant\PasswordResetLinkAbstraction;
+use App\Services\Traits\ModelAbstraction\General\Tenant\PasswordResetNotificationAbstraction;
 use App\Services\Traits\ModelAbstraction\General\Tenant\NewPasswordAbstraction;
 
 use App\Services\Traits\Utilities\ComputeUniqueIDService;
@@ -28,7 +28,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
 
     use EmailVerificationNotificationAbstraction;
     use VerifyEmailAbstraction;
-    use PasswordResetLinkAbstraction;
+    use PasswordResetNotificationAbstraction;
     use NewPasswordAbstraction;
 
     use ComputeUniqueIDService;
@@ -99,24 +99,28 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                     //leave it to the middleware to Delete All null before each request
             }
 
-            //After all these, send the mail for tenant email verification:
+            //After all these, send mail for tenant email for verification:
             $verify_token_was_sent = $this?->SendVerificationReqMail($request);
             //if it wasn't successful:
             if(!$verify_token_was_sent)
             {
                 //delete all records of this tenant:
                 $deleteKeysValues = [
-                    'tenant_email' => $request?->tenant_email
+                    'tenant_email' => $request?->tenant_email,
+                    'tenant_phone_number' => $request?->tenant_phone_number
                 ];
-                $this?->TenantDeleteSpecificService($deleteKeysValues);
-                throw new \Exception("Verification Request Mail wasn't sent successfully!");
+                $tenant_was_deleted = this?->TenantDeleteSpecificService($deleteKeysValues);
+                if($tenant_was_deleted)
+                {
+                    throw new \Exception("Verification Request Mail wasn't sent successfully!");
+                }
             }
 
             $status = [
                 'code' => 1,
                 'serverStatus' => 'RegisterSuccess!',
                 'short_description' => 'E-mail Verification Token was Sent to your email. Please login to Verify!',
-                'verify_token' => $verify_token_was_sent,
+                //'verify_token' => $verify_token_was_sent,
             ];
         }
         catch(\Exception $ex)
@@ -170,15 +174,15 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                 throw new \Exception("Invalid Input(s) provided!");
             }
 
-            $detailFound = $this?->TenantAuthenticateService($request);
-            if(!$detailFound)
+            $foundDetail = $this?->TenantAuthenticateService($request);
+            if(!$foundDetail)
             {
-                throw new \Exception("Failed login attempt. Invalid Email, Username or Password Provided!");
+                throw new \Exception("Failed login attempt. Invalid Email, Phone Number or Password Provided!");
             }
 
             //now start to prepare to update login status:
             //set query:
-            $uniqueToken = $detailsFound->unique_tenant_id;
+            $uniqueToken = $foundDetail->unique_tenant_id;
             $queryKeysValues = [
                 'unique_tenant_id' => $uniqueToken
             ];
@@ -197,7 +201,8 @@ final class TenantAccessController extends Controller implements TenantAccessInt
             //After logged in state was set, start generating the Bearer token for Authorization Header...
 
             //Now create the token:
-            $auth_header_token = $detailsFound->createToken('auth_header_token', ['tenant-crud']);
+            //This will be automatically handled by Sanctum and stored in database...
+            $auth_header_token = $foundDetail->createToken('auth_header_token', ['tenant-crud']);
             $auth_header_token_text = $auth_header_token->plainTextToken;
 
             //Then, build status:
@@ -205,7 +210,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                 'code' => 1,
                 'serverStatus' => 'LoginSuccess!',
                 //for subsequent calls inside the dashboard:
-                'UniqueId' => $detailsFound['unique_tenant_id'],//for Tenant Authentication
+                'UniqueId' => $foundDetail['unique_tenant_id'],//for Tenant Authentication
                 'tenantAuthToken' => $auth_header_token_text, //for Authorization header using Sanctum...
                 'decription' => "For subsequent calls to the dashboard endpoints, 
                                     tenantUniqueId must be included in the request body while 
@@ -244,11 +249,11 @@ final class TenantAccessController extends Controller implements TenantAccessInt
         }
         try
         {
-            $confirm_verify_state = $this?->TenantConfirmVerifiedStateViaId($verify);
+            $confirm_verify_state = $this?->TenantConfirmVerifiedStateService($request);
 
             if(!$confirm_verify_state)
             {
-                $verify_state_was_changed = $this?->TenantChangeVerifiedState($verify);
+                $verify_state_was_changed = $this?->TenantChangeVerifiedStateService($request);
                 if(!$verify_state_was_changed)
                 {
                     throw new \Exception("Tenant Email was not verified!");
@@ -257,7 +262,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                 $status = [
                     'code' => 1,
                     'serverStatus' => 'VerifiedSuccess!',
-                    'short_description' => 'Redirect to homepage here!'
+                    'short_description' => 'Verification Performed Successfully!'
                 ];
             }
             else
@@ -266,7 +271,7 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                  $status = [
                     'code' => 1,
                     'serverStatus' => 'VerifiedAlready!',
-                    'short_description' => 'Redirect to homepage here!'
+                    'short_description' => 'Take No Action!'
                 ];
             }
 
@@ -288,136 +293,75 @@ final class TenantAccessController extends Controller implements TenantAccessInt
     }
 
 
-    
-
-     //For Guests(Logged out users):
-     public function SendResetPassLink(Request $request): JsonResponse
-     {
-         $status = array();
-         try
-         {
-              //get rules from validator class:
-              $reqRules = $this?->sendRequestPassLinkRules();
+    //For Guests(Logged out users):
+    public function SendPassordResetToken(Request $request): JsonResponse
+    {
+        $status = array();
+        try
+        {
+            //get rules from validator class:
+            $reqRules = $this?->sendPassordResetTokenRules();
  
-              //validate here:
-              $validator = Validator::make($request?->all(), $reqRules);
+            //validate here:
+            $validator = Validator::make($request?->all(), $reqRules);
   
-             if($validator?->fails())
-             {
-                 throw new \Exception("Invalid Input provided!");
-             }
+            if($validator?->fails())
+            {
+                throw new \Exception("Invalid Input provided!");
+            }
+            //send the token:
+            $pass_reset_token_was_sent = $this?->TenantSendPasswordResetMailService($request);
  
-             //Get this tenant unique_tenant_id:
-             $queryKeysValues = [
-                'tenant_email'=>$request?->tenant_email
-            ];
-             $uniqueID = $this?->TenantReadSpecificService($queryKeysValues)->unique_tenant_id;
- 
-             //Use this to form link:
-             $pass_reset_link_was_sent = $this?->SendPasswordResetMail($request, 'tenant.click.link.reset.password', [
-                 'reset' => $uniqueID,
-                 'answer' => 'done',
-             ]);
- 
-             if(!$pass_reset_link_was_sent)
-             {
-                 //throw \Exception:
-                 throw new \Exception("Password Reset Link was not sent!");
-             }
-             $status = [
-                 'code' => 1,
-                 'serverStatus' => 'ResetLinkSent!',
-                 'pass_reset_link' =>  $pass_reset_link_was_sent
-             ];
-         }
-         catch(\Exception $ex)
-         {
-             $status = [
-                 'code' => 0,
-                 'serverStatus' => 'ResetLinkNotSent!',
-                 'short_description' => $ex?->getMessage(),
-             ];
-
-             return response()?->json($status, 400);
-         }
-         /*finally
-         {*/
-             //return response:
-             return response()?->json($status, 200);
-         //}
-     }
-     
- 
-     //for logged out user, outside the dashboard:
-     public function ClickResetPasswordLink(string $reset, string $answer): JsonResponse
-     {
-         $status = array();
-         try
-         {
-             $confirm_verify_state = $this?->TenantConfirmVerifiedStateViaId($reset);
- 
-             if(!$confirm_verify_state)
-             {
-                throw new Logic\Exception("You can change your password only after your email has been verified! Please verify your email now to continue!");
-             }
- 
-             //After this, return all both the tenant unique id and sanctum token (for Auth header):
-             $queryKeysValues = [
-                'unique_tenant_id' => $reset
-            ];
-             $tenantObject = $this?->TenantReadSpecificService($queryKeysValues);
-             //Now create new sanctum token :
-             $auth_header_token = $tenantObject->createToken('auth_header_token', ['tenant-update']);
-             $auth_header_token_text = $auth_header_token?->plainTextToken;
- 
-             $status = [
-                 'code' => 1,
-                 'serverStatus' => 'ResetAccessGranted!',
-                 //for subsequent calls inside the dashboard:
-                 'tenantUniqueId' => $tenantObject['unique_tenant_id'],//for Tenant Authentication
-                 'tenantAuthToken' => $auth_header_token_text, //for Authorization header using Sanctum...
-                 'decription' => "For the next password reset request (user interface), 
-                                    tenantUniqueId must be included in the request body while 
-                                    tenantAuthToken must be included in the Authorization header as a Bearer Token"
-             ];
-     
-         }
-         catch(\Exception $ex)
-         {
+            if(!$pass_reset_token_was_sent)
+            {
+                //throw \Exception:
+                throw new \Exception("Password Reset Token was not sent!");
+            }
             $status = [
-                 'code' => 0,
-                 'serverStatus' => 'ResetAccessRevoked!',
-                 'short_description' => $ex?->getMessage(),
+                'code' => 1,
+                'serverStatus' => 'PassResetTokenWasSent!',
+                /*these are for the next requests...for the screen of the actual reset password
+                which will include the new password and the pass reset token*/
+                'unique_tenant_id' => $pass_reset_token_was_sent,
+                'tenant_email' => $request->tenant_email,
             ];
- 
+        }
+        catch(\Exception $ex)
+        {
+            $status = [
+                'code' => 0,
+                'serverStatus' => 'PassResetTokenNotSent!',
+                'short_description' => $ex?->getMessage(),
+            ];
+
             return response()?->json($status, 400);
-         }
-         
-         /*finally
-         {*/
-             return response()?->json($status, 200);
-         //}
-     }
-    
- 
+        }
+        /*finally
+        {*/
+            //return response:
+            return response()?->json($status, 200);
+        //}
+    }
+     
+    //This brings the screen for change password with the new intented password and the token: 
      public function ImplementResetPassword(Request $request): JsonResponse
      {
          $status = array();
  
-         try
-         {       
-             //get rules from validator class:
-             $reqRules = $this?->implementResetPasswordRules();
+        try
+        {       
+            //get rules from validator class:
+            $reqRules = $this?->implementResetPasswordRules();
  
-             //validate here:'new_pass'
-             $validator = Validator::make($request?->all(), $reqRules);
+            //validate here:'new_pass'
+            $validator = Validator::make($request?->all(), $reqRules);
  
-             if($validator?->fails())
-             {
-                 throw new \Exception("Invalid Input provided!");
+            if($validator?->fails())
+            {
+                throw new \Exception("Invalid Input Provided!");
              }
  
-             $password_was_updated = $this?->TenantUpdatePasswordService($request);
+             $password_was_updated = $this?->TenantImplementResetPasswordService($request);
  
              if(!$password_was_updated)
              {
@@ -462,8 +406,8 @@ final class TenantAccessController extends Controller implements TenantAccessInt
                 throw new \Exception("Access denied, not logged in!");
             }
 
-            $has_logged_out = $this?->TenantLogoutService($request);
-            if(!$has_logged_out/*false*/)
+            $log_out_was_updated = $this?->TenantLogoutService($request);
+            if(!$log_out_was_updated/*false*/)
             {
                 throw new \Exception("Not logged out yet!");
             }

@@ -4,7 +4,7 @@ namespace App\Http\Middleware\Landlord;
 
 use Illuminate\Http\Request;
 
-use App\Services\Traits\Landlord\VerifyEmailAbstraction;
+use App\Services\Traits\ModelAbstractions\General\Landlord\VerifyEmailAbstraction;
 
 use Closure;
 
@@ -19,26 +19,27 @@ final class LandlordConfirmVerifyState
         
 		/**/ 
         //Before:
-        $landlord_email = $request?->landlord_email;
-        $landlord_unique_id = $request?->unique_landlord_id;
+
+        //check if token has been generated
+        $unique_landlord_id = $request?->landlord_email_or_username;
         try
         {
             if(!$landlord_unique_id)
             {
-                $landlord_was_verified_using_email = $this?->LandlordConfirmVerifiedStateViaEmail($landlord_email);
-                if(!$landlord_was_verified_using_email)
+                $landlord_was_verified = $this?->LandlordConfirmVerifiedStateService($unique_landlord_id);
+                if(!$landlord_was_verified)
                 {
-                    throw new Exception("You are not verified yet! Follow the link sent to your mail to activate your account!");
+                    throw new Exception("You are not verified yet! Please enter the 6-digit token sent to your mail to activate your account!");
                 }
             }
 
-            if(!$landlord_email)
+            if(!$landlord_email_or_username)
             {
                 $landlord_was_verified_using_id = $this?->LandlordConfirmVerifiedStateViaId($landlord_unique_id);
-                /*if(!$landlord_was_verified_using_id)
+                if(!$landlord_was_verified_using_id)
                 {
                     throw new Exception("You are not verified yet! Follow the link sent to your mail to activate your account!");
-                }*/
+                }
             }
            
         }
@@ -48,7 +49,6 @@ final class LandlordConfirmVerifyState
                 'code' => 0,
                 'serverStatus' => 'VerifyFailure!',
                 'short_description' => $ex->getMessage(),
-                //'state' => $landlord_was_verified_using_id
             ];
 
             return response()->json($status, 403);

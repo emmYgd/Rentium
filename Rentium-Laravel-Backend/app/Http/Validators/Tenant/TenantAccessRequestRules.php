@@ -9,7 +9,7 @@ trait TenantAccessRequestRules
 		//set validation rules:
         $rules = [
             'tenant_full_name' => 'required | string', 
-            'tenant_phone_number' => 'required | string',
+            'tenant_phone_number' => 'required | string', //e.g. +(234)08056963477 
             'tenant_email' => 'required | string | email | different:tenant_password',
             'tenant_password' => 'required | string | min:5 | max:15 | different:tenant_email,tenant_phone_number',
 
@@ -25,7 +25,7 @@ trait TenantAccessRequestRules
             'tenant_profession' => 'nullable | string',
             'tenant_got_pet' => 'nullable | bool',
             'pet_type' => 'nullable | json', //e.g.: Pets: {'Dogs' : 2, 'Cats': 1} */
-
+            'tenant_nin' => 'nullable | string',
         ];
 
         return $rules;
@@ -37,28 +37,41 @@ trait TenantAccessRequestRules
 		//set validation rules:
         $rules = [
             'tenant_email_or_phone_number' => 'required | string | different:tenant_password',
-            'tenant_password' => 'required | string | alpha_num | min:5| max: 15| different:tenant_username_or_email'
+            'tenant_password' => 'required | string | min:5| max: 15| different:tenant_email_or_phone_number'
         ];
 
         return $rules;
     }
 
     
-    protected function clickVerifyEmailRules(): array
+    protected function VerifyAccountRules(): array
     {
         $rules =  [
-            'unique_tenant_id'=>'required | string | exists:tenants',
+            'unique_tenant_id'=>'required | string | size:10 | exists:tenants',
+            'verify_token' => 'required | string | size:6 | exists:tenants',
         ];
         return $rules;
     }
 
 
-    protected function forgotPasswordRules(): array
+    protected function sendPassordResetTokenRules(): array
     {
         //set validation rules:
         $rules = [
-            'email_or_phone_number' => 'required | different:new_password',
-            'new_password' => 'required | min:7 | max:15 | different:email_or_username'
+            'tenant_email' => 'required | string | email | different:new_password | exists:tenants',
+        ];
+
+        return $rules;
+    }
+
+    protected function implementResetPasswordRules(): array
+    {
+        //set validation rules:
+        $rules = [
+            'unique_tenant_id' => 'required | string | size:10 | exists:tenants',
+            'tenant_email' => 'required | string | email | exists:tenants',
+            'tenant_new_password' => 'required | string | min:7 | max:15 | different:pass_reset_token',
+            'pass_reset_token' => 'required | string | size:6 |different:tenant_new_password | exists:tenants',
         ];
 
         return $rules;
@@ -69,7 +82,7 @@ trait TenantAccessRequestRules
     {
         //set validation rules:
         $rules = [
-            'unique_tenant_id' => 'required' //| unique: tenants',
+            'unique_tenant_id' => 'required | string | size:10 | exists:tenants',
         ];
 
         return $rules;

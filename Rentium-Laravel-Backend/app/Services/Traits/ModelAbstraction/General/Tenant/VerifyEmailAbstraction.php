@@ -8,10 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 
 use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
+use App\Services\Traits\Utilities\PassHashVerifyService;
 
 trait VerifyEmailAbstraction 
 {
     use TenantAccessAbstraction;
+    use PassHashVerifyService;
+
     /**
      * Mark the authenticated tenant's email address as verified.
      *
@@ -19,51 +22,38 @@ trait VerifyEmailAbstraction
      * @return \Illuminate\Http\RedirectResponse
      */
     
-    protected function TenantConfirmVerifiedStateViaEmail(string $tenant_email) : bool
-	{
+     protected function TenantConfirmVerifiedStateService(Request $request) : bool
+     {
+         $queryKeysValues = [
+             'unique_tenant_id' => $request?->unique_tenant_id
+         ];
+         $foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
+ 
+         //get the login state:
+         $verified_status = $foundDetail?->is_email_verified;
+         return $verified_status;
+     }
+ 
+     protected function TenantChangeVerifiedStateService(Request $request) : bool
+     {
         $queryKeysValues = [
-            'tenant_email' => $tenant_email
+            'unique_tenant_id' => $request?->unique_tenant_id,
+            //production:
+            //'verify_token' => $this->CustomHashPassword($request->verify_token);
+            //test:
+             'verify_token' => $request->verify_token
         ];
-		$detailsFoundViaEmail = $this?->TenantReadSpecificService($queryKeysValues);
-		//get the verified state:
-		$verified_status = $detailsFoundViaEmail['is_email_verified'];
-
-		return $verified_status;
-	}
-
-    protected function TenantConfirmVerifiedStateViaUsername(string $tenant_username) : bool
-	{
-        $queryKeysValues = [
-            'tenant_username' => $tenant_username
-        ];
-		$detailsFoundViaUsername = $this?->TenantReadSpecificService($queryKeysValues);
-		//get the verified state:
-		$verified_status = $detailsFoundViaUsername ['is_email_verified'];
-
-		return $verified_status;
-	}
-
-    protected function TenantConfirmVerifiedStateViaId(string $unique_tenant_id): bool
-    {
-        $queryKeysValues = [
-            'unique_tenant_id' => $unique_tenant_id
-        ];
-        $detailsFoundViaId = $this?->TenantReadSpecificService($queryKeysValues);
-        //get the verified state:
-        $verified_status = $detailsFoundViaId['is_email_verified'];
-
-        return $verified_status;
-    }
-
-    protected function TenantChangeVerifiedState(string $unique_tenant_id): bool
-    {
-        $queryKeysValues = [
-            'unique_tenant_id' => $unique_tenant_id
-        ];
-        $newKeysValues = ['is_email_verified' => true];
-		$is_verified = $this?->TenantUpdateSpecificService($queryKeysValues, $newKeysValues);
-
-        return $is_verified;
-    }
-
+         $newKeysValues = [
+             'is_email_verified' => true,
+         ];
+ 
+         //update:
+         $was_status_updated = $this->TenantUpdateSpecificService($queryKeysValues, $newKeysValues);
+         if(!$was_status_updated)
+         {
+             return false;
+         }
+ 
+         return true;
+     }
 }

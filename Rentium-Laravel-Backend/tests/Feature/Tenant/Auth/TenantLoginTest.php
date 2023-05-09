@@ -1,21 +1,21 @@
 <?php
 
-namespace Tests\Feature\Auth;
+namespace Tests\Feature\Tenant\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/*class TenantLoginTest extends TestCase
+class TenantLoginTest extends TestCase
 {
     //use RefreshDatabase;
 
-    /*public function test_new_buyers_can_login()
+    /*public function test_new_tenants_can_login()
     {
         $response = $this->patchJson(
-            route('buyer.login'), 
+            route('tenant.login'), 
             [
-                'buyer_email' => 'emmdammy@gmail.com',
-                'buyer_password' => 'emma@12crown',
+                'tenant_email_or_phone_number' => 'emmdammy@gmail.com',
+                'tenant_password' => 'emma@12crown',
             ],
             []
         );
@@ -24,5 +24,5 @@ use Tests\TestCase;
         //$response->assertNoContent();
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
-    }
-}*/
+    }*/
+}

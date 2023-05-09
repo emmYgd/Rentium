@@ -4,7 +4,7 @@ namespace App\Http\Middleware\Landlord;
 
 use Illuminate\Http\Request;
 
-use App\Services\Traits\ModelAbstractions\Landlord\LandlordAccessAbstraction;
+use App\Services\Traits\ModelAbstraction\Landlord\LandlordAccessAbstraction;
 
 use Closure;
 

@@ -1,26 +1,23 @@
 <?php
 
-namespace Tests\Feature\Auth;
+namespace Tests\Feature\Landlord\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/*class LandlordRegistrationTest extends TestCase
+class LandlordRegistrationTest extends TestCase
 {
     //use RefreshDatabase;
 
-    /*public function test_new_vendors_can_register()
+    public function test_new_landlords_can_register()
     {
-        $response = $this->postJson(
-            route('vendor.register'), 
+       /*$response = $this->postJson(
+            route('landlord.register'), 
             [
-            'vendor_first_name' => 'Techrite',
-            'vendor_middle_name' => 'Solutions',
-            'vendor_last_name' => 'Ltd',
-            'vendor_phone_number' => '+2349033068412',
-            'vendor_email' => 'emmdammy@gmail.com',
-            'vendor_password' => 'emma@12crown',
-            'vendor_password_confirmation' => 'emma@12crown',
+                'landlord_full_name' => 'Emmanuel Adediji',
+                'landlord_phone_number' => '+(234)08056963477',
+                'landlord_email' => 'emmdammy@gmail.com',
+                'landlord_password' => 'emma@12crown',
             ],
             []
         );
@@ -28,6 +25,7 @@ use Tests\TestCase;
         //$this->assertAuthenticated();
         //$response->assertNoContent();
         //$response->assertOk();
-        $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
+        $response->assertExactJson(['short_description' => "Invalid Input(s) provided!"]);
+        */
     }
-}*/
+}

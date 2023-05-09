@@ -11,15 +11,15 @@ use Illuminate\Support\LazyCollection;
 trait TenantCRUD
 {
 	//CRUD for services:
-	protected function TenantCreateAllService(Request | array $paramsToBeSaved): Tenant //bool
+	protected function TenantCreateAllService(Request | array $paramsToBeSaved): bool
 	{
-		/*$createModel =*/return Tenant::create($paramsToBeSaved);
-		/*if(!$createModel)
+		$createModel = Tenant::create($paramsToBeSaved);
+		if(!$createModel)
         {
             return false;
-        }*/
+        }
         
-        //return true;
+        return true;
 	}
 
 
@@ -53,26 +53,36 @@ trait TenantCRUD
 	protected function TenantReadAllLazySpecificService(array $queryKeysValues): LazyCollection 
 	{
 		//load this in chunk to avoid memory hang:
-		$readAllModel = Tenant::where($queryKeysValues)->lazy();
-		return $readAllModel;
+		$readAllModels = Tenant::where($queryKeysValues)->lazy();
+		return $readAllModels;
 	}
 
 	protected function TenantReadSpecificAllTestNullService(string $queryParam): LazyCollection
 	{
-		$readSpecificAllModel = Tenant::lazy()->where($queryParam, "!==", null);
+		$readSpecificAllModel = Tenant::where($queryParam, "!==", null)
+										->where($queryParam, "!==", "")
+										->lazy();
 		return $readSpecificAllModel;
 	}
 
 
 	protected function TenantUpdateSpecificService(array $queryKeysValues, array $newKeysValues): bool
 	{
-		Tenant::where($queryKeysValues)->update($newKeysValues);
+		$tenantModelUpdate = Tenant::where($queryKeysValues)->update($newKeysValues);
+		if(!$tenantModelUpdate)
+		{
+			return false;
+		}
 		return true;
 	}
 
 	protected function TenantDeleteSpecificService(array $deleteKeysValues): bool
 	{
-		Tenant::where($deleteKeysValues)->delete();
+		$tenantModelDelete = Tenant::where($deleteKeysValues)->delete();
+		if(!$tenantModelDelete)
+		{
+			return false;
+		}
 		return true;
 	}
 }
