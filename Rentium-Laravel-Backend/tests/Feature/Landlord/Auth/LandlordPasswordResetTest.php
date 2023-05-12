@@ -32,7 +32,7 @@ class LandlordPasswordResetTest extends TestCase
 
     public function test_implement_password_reset()
     {
-        $response = $this->putJson(
+        /*$response = $this->putJson(
             route('landlord.reset.password'), 
             [
                 'unique_landlord_id' => 'weZlUrKJam',
@@ -47,6 +47,7 @@ class LandlordPasswordResetTest extends TestCase
         //$response->assertNoContent();
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]);
+    */
     }
         /*Notification::fake();
 

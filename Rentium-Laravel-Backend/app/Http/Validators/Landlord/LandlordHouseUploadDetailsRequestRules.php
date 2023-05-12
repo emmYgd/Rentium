@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Validators;
+namespace App\Http\Validators\Landlord;
 
 trait LandlordHouseUploadDetailsRequestRules 
 {
@@ -12,7 +12,7 @@ trait LandlordHouseUploadDetailsRequestRules
             'property_category'=> 'required | string',//rent or lease
             'property_locality'=> 'required | string',//Lagos, Abuja
             'property_address'=> 'required | string',
-            'property_estate_name'=> 'required | string',
+            'property_estate_name'=> 'nullable | string',
             'property_type'=> 'required | string',//bungalow, duplex, mini-flat 
             'property_condition'=> 'required | string',//newly built, renovate, fairly used. 
             'property_bedrooms'=> 'required | numeric',//1 or 2

@@ -35,7 +35,7 @@ final class TenantConfirmVerifyState
 
             if(!$tenant_email_or_username)
             {
-                $tenant_was_verified_using_id = $this?->TenantConfirmVerifiedStateViaId($tenant_unique_id);
+                $tenant_was_verified_using_id = $this?->TenantConfirmVerifiedStateViaId($unique_tenant_id);
                 if(!$tenant_was_verified_using_id)
                 {
                     throw new Exception("You are not verified yet! Follow the link sent to your mail to activate your account!");

@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 
 use App\Services\Interfaces\Landlord\LandlordHouseUploadDetailsInterface;
 use App\Services\Traits\ModelAbstraction\Property\LandlordHouseUploadDetailsAbstraction;
-use App\Http\Controllers\Validators\Landlord\LandlordHouseUploadDetailsRequestRules;
+use App\Http\Validators\Landlord\LandlordHouseUploadDetailsRequestRules;
 
 final class LandlordHouseUploadDetailsController extends Controller implements LandlordHouseUploadDetailsInterface
 {
@@ -22,7 +22,7 @@ final class LandlordHouseUploadDetailsController extends Controller implements L
     }
 
     //tested with get but not with put...
-    private function UploadHouseTextDetails(Request $request): JsonResponse
+    public function UploadHouseTextDetails(Request $request): JsonResponse
     {
         $status = array();
 
@@ -36,14 +36,14 @@ final class LandlordHouseUploadDetailsController extends Controller implements L
 
             if($validator?->fails())
             {
-                throw new Exception("Invalid Input Provided!");
+                throw new \Exception("Invalid Input(s) Provided!");
             }
 
             //create without mass assignment:
-            $details_were_saved = $this?->LandlordSaveHouseTextDetailsService($request);
+            $details_were_saved = $this?->LandlordSaveHouseTextsService($request);
             if(!($details_were_saved['were_text_details_saved']))
             {
-                throw new Exception("Property Text Details not Saved!");
+                throw new \Exception("Property Text Details not Saved!");
             }
 
              $status = [
@@ -53,7 +53,7 @@ final class LandlordHouseUploadDetailsController extends Controller implements L
             ];
 
         }
-        catch(Exception $ex)
+        catch(\Exception $ex)
         {
             $status = [
                 'code' => 0,
@@ -70,7 +70,7 @@ final class LandlordHouseUploadDetailsController extends Controller implements L
 
 
      
-    private function UploadHouseImageDetails(Request $request): JsonResponse
+    public function UploadHouseImageDetails(Request $request): JsonResponse
     {
         $status = array();
 
@@ -84,14 +84,14 @@ final class LandlordHouseUploadDetailsController extends Controller implements L
 
             if($validator?->fails())
             {
-                throw new Exception("Invalid Input Provided!");
+                throw new \Exception("Invalid Input Provided!");
             }
 
             //create without mass assignment:
-            $property_images_were_saved = $this?->LandlordSaveHouseImageService($request);
+            $property_images_were_saved = $this?->LandlordSaveHouseImagesService($request);
             if(!$property_images_were_saved/*false*/)
             {
-                throw new Exception("Property Images not Saved!");
+                throw new \Exception("Property Images not Saved!");
             }
 
             $status = [
@@ -101,7 +101,7 @@ final class LandlordHouseUploadDetailsController extends Controller implements L
                 //'requestLists' => $request?->file('main_image_1')
             ];
         }
-        catch(Exception $ex)
+        catch(\Exception $ex)
         {
             $status = [
                 'code' => 0,
@@ -117,7 +117,7 @@ final class LandlordHouseUploadDetailsController extends Controller implements L
     }
 
 
-    private function UploadHouseClip(Request $request):  JsonResponse
+    public function UploadHouseClip(Request $request):  JsonResponse
     {
         $status = array();
 
@@ -131,14 +131,14 @@ final class LandlordHouseUploadDetailsController extends Controller implements L
 
             if($validator?->fails())
             {
-                throw new Exception("Invalid Input provided!");
+                throw new \Exception("Invalid Input provided!");
             }
 
             //create without mass assignment:
             $property_clip_was_saved = $this?->LandlordSaveHouseClipService($request);
             if(!$property_clip_was_saved/*false*/)
             {
-                throw new Exception("Property Clip not Saved!");
+                throw new \Exception("Property Clip not Saved!");
             }
 
             $status = [
@@ -148,7 +148,7 @@ final class LandlordHouseUploadDetailsController extends Controller implements L
             ];
 
         }
-        catch(Exception $ex)
+        catch(\Exception $ex)
         {
             $status = [
                 'code' => 0,

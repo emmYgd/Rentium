@@ -2,7 +2,7 @@
 
 namespace App\Services\Traits\ModelCRUD\Property;
 
-use App\Models\Property;
+use App\Models\Property\Property;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;

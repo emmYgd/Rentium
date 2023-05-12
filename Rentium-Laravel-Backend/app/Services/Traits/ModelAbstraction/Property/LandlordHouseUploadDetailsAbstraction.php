@@ -13,7 +13,7 @@ trait LandlordHouseUploadDetailsAbstraction
 	use PropertyCRUD;
 	use ComputeUniqueIDService;
 
-	protected function LandlordSavePropertyDetailsService(Request $request): array
+	protected function LandlordSaveHouseTextsService(Request $request): array
 	{
 		//get all requests:
 		//$to_persist_array = $request?->except('unique_lanlord_id');
@@ -32,7 +32,7 @@ trait LandlordHouseUploadDetailsAbstraction
 	}
 
 
-	protected function LandlordSaveHouseImageService(Request $request): bool
+	protected function LandlordSaveHouseImagesService(Request $request): bool
 	{
 		/*note: files are to be stored in the database for now...
 		this could change in the future to include storing files on disk 

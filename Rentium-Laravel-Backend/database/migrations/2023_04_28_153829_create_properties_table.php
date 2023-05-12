@@ -55,25 +55,26 @@ return new class extends Migration
             
             // property images to be uploaded:
             //environment:
-            $table->binary('property_image_1_environment');
+            $table->binary('property_image_1_environment')->nullable();
             $table->binary('property_image_2_environment')->nullable();
             //compound:
-            $table->binary('property_image_1_compound'); 
+            $table->binary('property_image_1_compound')->nullable(); 
             $table->binary('property_image_2_compound')->nullable(); 
             //rooms:
-            $table->binary('property_image_rooms_1');
-            $table->binary('property_image_rooms_2');
+            $table->binary('property_image_rooms_1')->nullable();
+            $table->binary('property_image_rooms_2')->nullable();
             $table->binary('property_image_rooms_3')->nullable(); 
             $table->binary('property_image_rooms_4')->nullable();
             //convieniences:
-            $table->binary('property_image_convieniences_1');//bathroom_toilet
+            $table->binary('property_image_convieniences_1')->nullable();//bathroom_toilet
             $table->binary('property_image_convieniences_2')->nullable();//bathroom_toilet 
             //kitchen:
-            $table->binary('property_image_kitchen_1'); 
+            $table->binary('property_image_kitchen_1')->nullable(); 
             $table->binary('property_image_kitchen_2')->nullable(); 
-            //facility: running water, solar panel, electric generator, etc. 
-            $table->binary('property_image_facility_1');
-            $table->binary('property_image_facility_2'); 
+        \
+                    //facility: running water, solar panel, electric generator, etc. 
+            $table->binary('property_image_facility_1')->nullable();
+            $table->binary('property_image_facility_2')->nullable(); 
             $table->binary('property_image_facility_3')->nullable(); 
             $table->binary('property_image_facility_4')->nullable();
 
@@ -88,4 +89,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('properties');
     }
-};
+};  ``

@@ -4,7 +4,7 @@ namespace App\Http\Middleware\Landlord;
 
 use Illuminate\Http\Request;
 
-use App\Services\Traits\ModelAbstractions\General\Landlord\VerifyEmailAbstraction;
+use App\Services\Traits\ModelAbstraction\General\Landlord\VerifyEmailAbstraction;
 
 use Closure;
 
@@ -21,29 +21,21 @@ final class LandlordConfirmVerifyState
         //Before:
 
         //check if token has been generated
-        $unique_landlord_id = $request?->landlord_email_or_username;
+        $unique_landlord_id = $request?->unique_landlord_id;
+
         try
         {
-            if(!$landlord_unique_id)
+            if($unique_landlord_id)
             {
-                $landlord_was_verified = $this?->LandlordConfirmVerifiedStateService($unique_landlord_id);
+                $landlord_was_verified = $this?->LandlordConfirmVerifiedStateService($request);
                 if(!$landlord_was_verified)
                 {
-                    throw new Exception("You are not verified yet! Please enter the 6-digit token sent to your mail to activate your account!");
+                    throw new \Exception("You are not verified yet! Please enter the 6-digit token sent to your mail to activate your account!");
                 }
             }
 
-            if(!$landlord_email_or_username)
-            {
-                $landlord_was_verified_using_id = $this?->LandlordConfirmVerifiedStateViaId($landlord_unique_id);
-                if(!$landlord_was_verified_using_id)
-                {
-                    throw new Exception("You are not verified yet! Follow the link sent to your mail to activate your account!");
-                }
-            }
-           
         }
-        catch(Exception $ex)
+        catch(\Exception $ex)
         {
             $status = [
                 'code' => 0,
