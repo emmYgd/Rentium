@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Http\Request;
 
-use App\Services\Traits\ModelAbstractions\Landlord\LandlordAccessAbstraction;
+use App\Services\Traits\ModelAbstraction\Landlord\LandlordAccessAbstraction;
 
 class SendPasswordResetMail extends Mailable
 {
@@ -22,7 +22,7 @@ class SendPasswordResetMail extends Mailable
      */
 
     public $landlord_request;
-    public $pass_reset_link;
+    public $pass_reset_token;
     public $landlordModel;
 
     public function __construct(Request $landlord_request, string $pass_reset_token)

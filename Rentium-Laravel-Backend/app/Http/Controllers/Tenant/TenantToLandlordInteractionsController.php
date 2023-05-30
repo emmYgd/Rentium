@@ -13,7 +13,7 @@ use App\Services\Traits\ModelAbstraction\Tenant\TenantToLandlordInteractionsAbst
 use App\Services\Traits\Utilities\ComputeUniqueIDService;
 
 
-final class TenantToLandlordInteractionsController extends Controller implements TenantToLandlordInteractionInterface
+final class TenantToLandlordInteractionsController extends Controller implements TenantToLandlordInteractionsInterface
 {
     use TenantToLandlordInteractionsRequestRules;
     use TenantToLandlordInteractionsAbstraction;
@@ -22,11 +22,11 @@ final class TenantToLandlordInteractionsController extends Controller implements
     public function __construct()
     {
         //initialize Tenant Object:
-        //private $Tenant = new Tenant;
+        //public $Tenant = new Tenant;
     }
     
     //search either by username, email address, phone-number or tenant_id
-	private function SearchForLandlord(Request $request): JsonResponse 
+	public function SearchForLandlord(Request $request): JsonResponse 
     {
         $status = array();
         try
@@ -74,7 +74,7 @@ final class TenantToLandlordInteractionsController extends Controller implements
     }
 
 
-    private function SearchForPropertyInvitations(Request $request): JsonResponse
+    public function SearchForPropertyInvitations(Request $request): JsonResponse
     {
         $status = array();
 
@@ -163,7 +163,7 @@ final class TenantToLandlordInteractionsController extends Controller implements
     }
 
 
-    private function MakePropertyRequest(Request $request): JsonResponse
+    public function MakePropertyRequest(Request $request): JsonResponse
     {
         $status = array();
 

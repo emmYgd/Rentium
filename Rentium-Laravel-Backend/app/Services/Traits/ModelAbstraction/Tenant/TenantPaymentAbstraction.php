@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 //use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Crypt;
 
-use App\Services\Traits\ModelCRUD\TenantBankDetailsCRUD;
-use App\Models\TenantBankDetails;
+use App\Services\Traits\ModelCRUD\Tenant\TenantBankDetailsCRUD;
+use App\Models\Tenant\TenantBankDetails;
 
 trait TenantBankandPaymentAbstraction
 {

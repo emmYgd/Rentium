@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Traits\ModelAbstraction\Landlord;
+namespace App\Services\Traits\ModelAbstraction\Tenant;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;

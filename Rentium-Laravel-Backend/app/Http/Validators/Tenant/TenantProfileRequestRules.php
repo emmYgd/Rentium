@@ -2,7 +2,7 @@
 
 namespace App\Http\Validators\Tenant;
 
-trait TenantAccessRequestRules 
+trait TenantProfileRequestRules 
 {
     protected function editImageRules(): array
     {

@@ -18,16 +18,28 @@ trait TenantAccessAbstraction
 	use PassHashVerifyService;
 
 
-	protected function TenantConfirmLoginStateService(Request $request) : bool
+	protected function TenantConfirmLoginStateService(Request $request) : bool | null
 	{
-		$queryKeysValues = [
-			'unique_tenant_id' => $request?->unique_tenant_id
-		];
-		$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
-
+		$foundDetail = $this->TenantFoundDetailService($request);
+		if(!$foundDetail)
+		{
+			throw new \Exception("Cannot find Tenant details");
+		}
 		//get the login state:
 		$login_status = $foundDetail?->is_logged_in;
 		return $login_status;
+	}
+
+	protected function TenantConfirmVerifiedStateService(Request $request) : bool
+	{
+		$foundDetail = $this->TenantFoundDetailService($request);
+		if(!$foundDetail)
+		{
+			throw new \Exception("Cannot find Tenant details");
+		}
+		//get the login state:
+		$verified_status = $foundDetail?->is_email_verified;
+		return $verified_status;
 	}
 
 
@@ -61,8 +73,7 @@ trait TenantAccessAbstraction
 
 		return $was_logout_status_ensured;
 	}
-
-
+	
 	protected function TenantRegisterService(Request $request): bool
 	{
 		$newKeyValues = $request?->all();
@@ -115,8 +126,7 @@ trait TenantAccessAbstraction
         return $foundDetail;
     }
 
-
-	protected function TenantFoundDetailService(Request $request): Tenant | bool
+	protected function TenantFoundDetailService(Request $request): Tenant | bool | null
 	{
 		//init:
 		$queryKeysValues = array();
@@ -133,6 +143,11 @@ trait TenantAccessAbstraction
 			$queryKeysValues = [
 				'unique_tenant_id' => $unique_tenant_id,
 			];
+			$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				return false;
+			}
 		}
 
 		if($tenant_email)
@@ -140,13 +155,23 @@ trait TenantAccessAbstraction
 			$queryKeysValues = [
 				'tenant_email' => $tenant_email,
 			];
+			$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				return false;
+			}
 		}
 
-		if(!$tenant_phone_number)
+		if($tenant_phone_number)
 		{
 			$queryKeysValues = [
 				'tenant_phone_number' => $tenant_phone_number,
 			];
+			$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				return false;
+			}
 		}
 
 		if($tenant_email_or_phone_number)
@@ -167,16 +192,8 @@ trait TenantAccessAbstraction
 				}
 			}
 		}
-		
-		$foundDetail = $this?->TenantReadSpecificService($queryKeysValues);
-		if(!$foundDetail)
-		{
-			return false;
-		}
 
-		//finally, get the login state:
-		$login_status = $foundDetail?->is_logged_in;
-		return $login_status;
+		return $foundDetail;
 	}
 
 

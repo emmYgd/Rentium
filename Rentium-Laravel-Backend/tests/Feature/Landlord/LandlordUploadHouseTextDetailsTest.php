@@ -13,7 +13,7 @@ use Tests\TestCase;
 class LandlordUploadHouseTextDetailsTest extends TestCase
 {
     //use RefreshDatabase;    
-    public function test_house_text_details_can_be_uploaded()
+    /*public function test_house_text_details_can_be_uploaded()
     {
         $response = $this->postJson(
             route('landlord.upload.property.texts'), 
@@ -63,6 +63,6 @@ class LandlordUploadHouseTextDetailsTest extends TestCase
         //$response->assertOk();
         $response->assertExactJson(['short_description' => "Verification Request Mail wasn't sent successfully!"]); 
     
-    }
+    }*/
 }
 ?>

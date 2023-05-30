@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Http\Request;
 
-use App\Services\Traits\ModelAbstractions\Tenant\TenantAccessAbstraction;
+use App\Services\Traits\ModelAbstraction\Tenant\TenantAccessAbstraction;
 
 class SendPasswordResetMail extends Mailable
 {
@@ -22,7 +22,7 @@ class SendPasswordResetMail extends Mailable
      */
 
     public $tenant_request;
-    public $pass_reset_link;
+    public $pass_reset_token;
     public $tenantModel;
 
     public function __construct(Request $tenant_request, string $pass_reset_token)

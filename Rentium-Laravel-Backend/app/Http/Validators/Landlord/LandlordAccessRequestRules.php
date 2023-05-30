@@ -43,6 +43,15 @@ trait LandlordAccessRequestRules
         return $rules;
     }
 
+    protected function confirmLoginStateRules(): array
+    {
+        //set validation rules:
+        $rules = [
+            'unique_landlord_id' => 'required | string | size:10 | exists:landlords',
+        ];
+
+        return $rules;
+    }
     
     protected function VerifyAccountRules(): array
     {

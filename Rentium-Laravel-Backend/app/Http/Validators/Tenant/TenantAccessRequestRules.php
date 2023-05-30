@@ -11,7 +11,7 @@ trait TenantAccessRequestRules
             'tenant_full_name' => 'required | string', 
             'tenant_phone_number' => 'required | string', //e.g. +(234)08056963477 
             'tenant_email' => 'required | string | email | different:tenant_password',
-            'tenant_password' => 'required | string | min:5 | max:15 | different:tenant_email,tenant_phone_number',
+            'tenant_password' => 'required | string | min:7 | max:15 | different:tenant_email,tenant_phone_number',
 
             'tenant_current_country' => 'nullable | string | different:tenant_current_state',
             'tenant_current_state'=> 'nullable | string | different:tenant_country,tenant_current_city_or_town',
@@ -44,6 +44,17 @@ trait TenantAccessRequestRules
     }
 
     
+    protected function confirmLoginStateRules(): array
+    {
+        //set validation rules:
+        $rules = [
+            'unique_tenant_id' => 'required | string | size:10 | exists:tenants',
+        ];
+
+        return $rules;
+    }
+
+    
     protected function VerifyAccountRules(): array
     {
         $rules =  [
@@ -63,7 +74,7 @@ trait TenantAccessRequestRules
 
         return $rules;
     }
-
+    
     protected function implementResetPasswordRules(): array
     {
         //set validation rules:

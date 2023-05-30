@@ -20,54 +20,61 @@ use Illuminate\Support\Facades\Route;
 
 
 //Tenant Auth:
-Route::prefix("v1/tenant/")->group(function() 
-{
-	Route::middleware("TenantCleanNullRecords")->group(function()
-	{
-		$common_auth_controller_url = "App\Http\Controllers\Tenant\TenantAccessController";
-		
-		Route::post("register", [
-			"as" => "tenant.register",
-			//"middleware" => "",
-			"uses" => "{$common_auth_controller_url}@Register"
-		]);
+Route::prefix("v1/tenant/")->group(function () {
 
-		Route::patch("dashboard/login", [
-			"as" => "tenant.login",
-			//"middleware" => "",
-			"uses" => "{$common_auth_controller_url}@LoginDashboard"
-		]);
+	Route::middleware("TenantCleanNullRecords")->group(function () {
 
-		Route::put("verifications/verify", [
-			"as" => "tenant.verify",
-			"middleware" => ["TenantConfirmLoginState", "throttle:6,1"],
-			"uses" => "{$common_auth_controller_url}@VerifyAccount"
-		]);
+		Route::prefix("auth/")->group(function () {
+			$common_auth_controller_url = "App\Http\Controllers\Tenant\TenantAccessController";
 
-        Route::put("dashboard/logout", [
-			"as" => "tenant.logout",
-			"middleware" => ["TenantConfirmLoginState", "TenantDestroyTokenAfterLogout", "auth:sanctum", "ability:tenant-crud"],
-			"uses" => "{$common_auth_controller_url}@Logout"
-        ]);
+			Route::post("register", [
+				"as" => "tenant.register",
+				//"middleware" => "",
+				"uses" => "{$common_auth_controller_url}@Register"
+			]);
 
-		//This is only for guests: send the password reset link to the tenant gmail:
-		Route::put("guest/send/forgot-password/link", [
-			"as" => "tenant.send.password.reset.token",
-			"middleware" => ["TenantEnsureLogoutState", "guest"],
-			"uses" => "{$common_auth_controller_url}@SendPassordResetToken"
-		]);
+			Route::put("dashboard/login", [
+				"as" => "tenant.login",
+				//"middleware" => "",
+				"uses" => "{$common_auth_controller_url}@LoginDashboard"
+			]);
 
-		//This option will be presented to the guest: 
-		Route::put("guest/reset/password", [
-			"as" => "tenant.reset.password",
-			"middleware" => ["TenantEnsureLogoutState", "guest"],
-			"uses" => "{$common_auth_controller_url}@ImplementResetPassword"
-		]);
+			Route::patch("confirm/login/state", [
+				"as" => "tenant.confirm.login.state",
+				"middleware" => [/*"auth:sanctum", "ability:tenant-crud"*/],
+				"uses" => "{$common_auth_controller_url}@ConfirmLoginState"
+			]);
+
+			Route::put("verifications/verify", [
+				"as" => "tenant.verify",
+				"middleware" => ["TenantEnsureLogoutState", /*"throttle:6,1"*/],
+				"uses" => "{$common_auth_controller_url}@VerifyAccount"
+			]);
+
+			Route::put("logout/dashboard", [
+				"as" => "tenant.logout",
+				"middleware" => ["TenantConfirmLoginState", "TenantDestroyTokenAfterLogout", /*"auth:sanctum", "ability:tenant-crud"*/],
+				"uses" => "{$common_auth_controller_url}@Logout"
+			]);
+
+			//This is only for guests: send the password reset link to the tenant gmail:
+			Route::patch("guest/send/reset/password/token", [
+				"as" => "tenant.send.password.reset.token",
+				"middleware" => ["TenantEnsureLogoutState", "guest"],
+				"uses" => "{$common_auth_controller_url}@SendPassordResetToken"
+			]);
+
+			//This option will be presented to the guest: 
+			Route::patch("guest/reset/password", [
+				"as" => "tenant.reset.password",
+				"middleware" => ["TenantEnsureLogoutState", "guest"],
+				"uses" => "{$common_auth_controller_url}@ImplementResetPassword"
+			]);
+		});
 	});
 
-	Route::prefix("searches/")->group(function() 
-	{
-		$common_house_fetch_controller_url = "App\Http\Controllers\Tenant\TenantHouseFetchController";
+	Route::prefix("searches/")->group(function () {
+		$common_house_fetch_controller_url = "App\Http\Controllers\Tenant\TenantHouseFetchDetailsController";
 
 		//all housefetchs to allow for frontend complex search by the JS dev:
 		Route::get("fetch/available/propertys/by/category", [
@@ -82,88 +89,88 @@ Route::prefix("v1/tenant/")->group(function()
 			"as" => "tenant.fetch.each.property",
 			//"middleware" => "init",
 			"uses" => "{$common_house_fetch_controller_url}@FetchEachHousingDetails"
-		]);	
+		]);
 
-		Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:tenant-crud", "TenantConfirmLoginState", "TenantConfirmVerifyState"])->group(function()
-		{
-			$common_house_fetch_controller_url = "App\Http\Controllers\Tenant\TenantHouseFetchController";
+		Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:tenant-crud", "TenantConfirmLoginState", "TenantConfirmVerifyState"])->group(function () {
+			$common_house_fetch_controller_url = "App\Http\Controllers\Tenant\TenantHouseFetchDetailsController";
 
 			Route::get("fetch/all/landords/summary", [
 				"as" => "tenant.fetch.all.landlords",
 				//"middleware" => "",
 				"uses" => "{$common_house_fetch_controller_url}@FetchAllLandlordSummary"
 			]);
-	
+
 			Route::post("fetch/each/landlord/detail", [
-				"as" => "tenant.fetch.specific.landlord", 
+				"as" => "tenant.fetch.specific.landlord",
 				//"middleware" => [],
-    			"uses" => "{$common_house_fetch_controller_url}@SearchForLandlord"
+				"uses" => "{$common_house_fetch_controller_url}@SearchForLandlord"
 			]);
 
 			Route::post("fetch/all/landlord/invitations", [
-				"as" => "tenant.fetch.all.invitations", 
+				"as" => "tenant.fetch.all.invitations",
 				//"middleware" => "",
-    			"uses" => "{$common_house_fetch_controller_url}@SearchAllPropertyInvitations"
+				"uses" => "{$common_house_fetch_controller_url}@SearchAllPropertyInvitations"
 			]);
 
 			Route::post("fetch/each/landlord/invitation", [
-				"as" => "tenant.fetch.each.invitation", 
+				"as" => "tenant.fetch.each.invitation",
 				//"middleware" => ,
-    			"uses" => "{$common_house_fetch_controller_url}@SearchEachPropertyInvitation"
+				"uses" => "{$common_house_fetch_controller_url}@SearchEachPropertyInvitation"
 			]);
 
 			Route::post("fetch/all/own/requests/made", [
-                                                                                                                     				"as" => "tenant.fetch.all.own.requests", 
+				"as" => "tenant.fetch.all.own.requests",
 				//"middleware" => "",
-    			"uses" => "{$common_house_fetch_controller_url}@SearchAllPropertyRequests"
+				"uses" => "{$common_house_fetch_controller_url}@SearchAllPropertyRequests"
 			]);
 
 			Route::post("fetch/each/own/request/made", [
-				"as" => "tenant.fetch.each.own.request", 
+				"as" => "tenant.fetch.each.own.request",
 				//"middleware" => "",
-    			"uses" => "{$common_house_fetch_controller_url}@SearchEachPropertyRequest"
+				"uses" => "{$common_house_fetch_controller_url}@SearchEachPropertyRequest"
 			]);
 		});
 	});
 
 
-	Route::prefix("actions/")->group(function() 
-	{
-		Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:tenant-crud", "TenantConfirmLoginState", "TenantConfirmVerifyState"])->group(function()
-		{
+	Route::prefix("actions/")->group(function () {
+		Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:tenant-crud", "TenantConfirmLoginState", "TenantConfirmVerifyState"])->group(function () {
 			$common_house_action_controller_url = "App\Http\Controllers\Tenant\TenantToLandlordInteractionsController";
 			//$common_landlord_action_controller_url = "App\Http\Controllers\Tenant\TenantToLandlordInteractionsController";
 
 			//all housefetchs to allow for frontend complex search by the JS dev:
-			Route::get("show/interest/in/property/invitations", [
+			Route::put("show/interest/in/property/invitations", [
 				"as" => "tenant.show.invitation.interest",
 				//"middleware" => "init",
 				"uses" => "{$common_house_action_controller_url}@ShowInterestInPropertyInvitations"
 			]);
 
-			Route::get("make/property/request/", [
+			Route::post("make/property/request", [
 				"as" => "tenant.make.property.request",
 				//"middleware" => "init",
 				"uses" => "{$common_house_action_controller_url}@MakePropertyRequest"
 			]);
 
-			Route::post("delete/each/property/request", [
+			Route::delete("delete/each/property/request", [
 				"as" => "tenant.delete.each.property.request",
 				//"middleware" => "init",
 				"uses" => "{$common_house_action_controller_url}@DeleteEachPropertyRequest"
 			]);
 
+			Route::put("approve/disapprove/property/after/inspection", [
+				"as" => "tenant.approve.disapprove.house.after.inspection",
+				//"middleware" => "init",
+				"uses" => "{$common_house_action_controller_url}@(Dis)ApproveProperyAfterInspection"
+			]);
 		});
 	});
 
 
 	//Profile:	
-	Route::prefix("utils/dashboard/")->middleware([ "auth:sanctum", "ability:tenant-crud", "TenantConfirmLoginState", "TenantConfirmVerifyState"])->group(function() 
-	{
-		Route::prefix("profile/")->group(function()
-		{
+	Route::prefix("utils/dashboard/")->middleware(["auth:sanctum", "ability:tenant-crud", "TenantConfirmLoginState", "TenantConfirmVerifyState"])->group(function () {
+		Route::prefix("profile/")->group(function () {
 			$common_profile_controller_url = "App\Http\Controllers\Tenant\TenantProfileController";
-			
+
 			//This option will be presented to the already logged in user: 
 			Route::put("authenticated/change/password", [
 				"as" => "tenant.auth.change.password",
@@ -192,8 +199,7 @@ Route::prefix("v1/tenant/")->group(function()
 		});
 
 
-		Route::prefix("comments_ratings/")->group(function() 
-		{
+		Route::prefix("comments_ratings/")->group(function () {
 			$common_comments_ratings_controller_url = "App\Http\Controllers\Tenant\TenantSocialCommentsAndRatingsController";
 
 			Route::get("upload/commments/ratings", [
@@ -208,10 +214,9 @@ Route::prefix("v1/tenant/")->group(function()
 				"uses" => "{$common_comments_ratings_controller_url}@ViewOtherTenantsCommentsRatingsOnLandlord"
 			]);
 		});
-		
 
-		Route::prefix("payments/")->group(function() 
-		{
+
+		Route::prefix("payments/")->group(function () {
 			$common_payment_controller_url = "App\Http\Controllers\Tenant\TenantPaymentController";
 			$common_payment_execution_controller_url = "App\Http\Controllers\Tenant\TenantPaymentExecuteController";
 
@@ -266,7 +271,7 @@ Route::prefix("v1/tenant/")->group(function()
 			/*This will be used in future for crypto:*/
 
 			//This will be for later - an option to use the crypto wallet payment option:
-				/*Route::post("upload/crypto/wallet/details", [
+			/*Route::post("upload/crypto/wallet/details", [
 					"as" => "tenant.upload.crypto.wallet.details", 
 					//"middleware" => "init",
 					"uses" => "UploadCryptoWalletDetails"
@@ -278,7 +283,7 @@ Route::prefix("v1/tenant/")->group(function()
 					"uses" => "FetchCryptoWalletDetails"
 				]);*/
 
-				/*Route::post("make/payment/with/new/crypto/wallet/details", [
+			/*Route::post("make/payment/with/new/crypto/wallet/details", [
 					//"as" => "tenant.pay.with.new.crypto",
 					//"middleware" => "init",
 					"uses" => "{$common_payment_execution_controller_url}@MakePaymentWithNewCrypto"
@@ -299,10 +304,8 @@ Route::prefix("v1/tenant/")->group(function()
 		});
 
 
-		Route::prefix("social/")->group(function()
-		{
-			Route::prefix("messaging/")->group(function() 
-			{
+		Route::prefix("social/")->group(function () {
+			Route::prefix("messaging/")->group(function () {
 				$common_contact_controller_url = "App\Http\Controllers\Tenant\TenantSocialContactController";
 
 				Route::post("send/admin/message", [
@@ -336,8 +339,7 @@ Route::prefix("v1/tenant/")->group(function()
 				]);
 			});
 
-			Route::prefix("referral/")->group(function() 
-			{
+			Route::prefix("referral/")->group(function () {
 				$common_referral_controller_url = "App\Http\Controllers\Tenant\TenantSocialReferralController";
 
 				Route::post("generate/unique/referral/link", [
@@ -358,7 +360,7 @@ Route::prefix("v1/tenant/")->group(function()
 					"uses" => "{$common_referral_controller_url}@UseReferralLink"
 				]);
 			});
-		
+
 			/*Route::prefix("wishlist/")->middleware("DeleteEmptyWishlists")->group(function()
 			{
 				$common_wishlist_controller_url = "App\Http\Controllers\Tenant\TenantWishlistEditController";
@@ -405,79 +407,81 @@ Route::prefix("v1/tenant/")->group(function()
 				});
 			});*/
 		});
-	});	
-
+	});
 });
 
 
 //Landlord Auth:
-Route::prefix("v1/landlord/")->group(function() 
-{
+Route::prefix("v1/landlord/")->group(function () {
 
-	Route::middleware("LandlordCleanNullRecords")->group(function()
-	{
-		$common_auth_controller_url = "App\Http\Controllers\Landlord\LandlordAccessController";
-		
-		Route::post("register", [
-			"as" => "landlord.register",
-			//"middleware" => "",
-			"uses" => "{$common_auth_controller_url}@Register"
-		]);
+	Route::middleware("LandlordCleanNullRecords")->group(function () {
+		Route::prefix("auth/")->group(function () {
+			$common_auth_controller_url = "App\Http\Controllers\Landlord\LandlordAccessController";
 
-		Route::patch("dashboard/login", [
-			"as" => "landlord.login",
-			//"middleware" => "",
-			"uses" => "{$common_auth_controller_url}@LoginDashboard"
-		]);
+			Route::post("register", [
+				"as" => "landlord.register",
+				//"middleware" => "",
+				"uses" => "{$common_auth_controller_url}@Register"
+			]);
 
-		Route::put("verifications/verify", [
-			"as" => "landlord.verify",
-			"middleware" => ["LandlordConfirmLoginState", "throttle:6,1", "auth:sanctum", "ability:landlord-crud"],
-			"uses" => "{$common_auth_controller_url}@VerifyAccount"
-		]);
+			Route::put("login/dashboard", [
+				"as" => "landlord.login",
+				//"middleware" => "",
+				"uses" => "{$common_auth_controller_url}@LoginDashboard"
+			]);
 
-        Route::put("dashboard/logout", [
-			"as" => "landlord.logout",
-			"middleware" => ["LandlordConfirmLoginState", "LandlordDestroyTokenAfterLogout", "auth:sanctum", "ability:landlord-crud"],
-			"uses" => "{$common_auth_controller_url}@Logout"
-        ]);
+			Route::patch("confirm/login/state", [
+				"as" => "landlord.confirm.login.state",
+				"middleware" => [/*"auth:sanctum", "ability:landlord-crud"*/],
+				"uses" => "{$common_auth_controller_url}@ConfirmLoginState"
+			]);
 
-		//This is only for guests: send the password reset link to the landlord gmail:
-		Route::put("guest/send/forgot-password/link", [
-			"as" => "landlord.send.password.reset.token",
-			"middleware" => ["LandlordEnsureLogoutState", "guest"],
-			"uses" => "{$common_auth_controller_url}@SendPassordResetToken"
-		]);
+			Route::put("verifications/verify", [
+				"as" => "landlord.verify",
+			"middleware" => ["LandlordEnsureLogoutState", /*"throttle:6,1"*/],
+				"uses" => "{$common_auth_controller_url}@VerifyAccount"
+			]);
 
-		//This option will be presented to the guest: 
-		Route::put("guest/reset/password", [
-			"as" => "landlord.reset.password",
-			"middleware" => ["LandlordEnsureLogoutState", "guest"],
-			"uses" => "{$common_auth_controller_url}@ImplementResetPassword"
-		]);
+			Route::put("logout/dashboard", [
+				"as" => "landlord.logout",
+				"middleware" => ["LandlordConfirmLoginState", "LandlordDestroyTokenAfterLogout", /*"auth:sanctum", "ability:landlord-crud"*/],
+				"uses" => "{$common_auth_controller_url}@Logout"
+			]);
 
+			//This is only for guests: send the password reset link to the landlord gmail:
+			Route::patch("guest/send/reset/password/token", [
+				"as" => "landlord.send.password.reset.token",
+				"middleware" => ["LandlordEnsureLogoutState", "guest"],
+				"uses" => "{$common_auth_controller_url}@SendPassordResetToken"
+			]);
+
+			//This option will be presented to the guest: 
+			Route::patch("guest/reset/password", [
+				"as" => "landlord.reset.password",
+				//"middleware" => ["LandlordEnsureLogoutState", "guest"],
+				"uses" => "{$common_auth_controller_url}@ImplementResetPassword"
+			]);
+		});
 	});
 
 
-	Route::prefix("searches/")->group(function() 
-	{
-		Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:landlord-crud", "LandlordConfirmLoginState", "LandlordConfirmVerifyState"])->group(function()
-		{
+	Route::prefix("searches/")->group(function () {
+		Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:landlord-crud", "LandlordConfirmLoginState", "LandlordConfirmVerifyState"])->group(function () {
 
 			$common_landlord_fetch_controller_url = "App\Http\Controllers\Landlord\LandlordHouseFetchDetailsController";
 			$common_landlord_house_tenant_controller_url = "App\Http\Controllers\Landlord\LandlordToTenantInteractionsController";
-			
-			Route::get("fetch/all/own/propertys", [
+
+			Route::get("fetch/all/own/propertys/summary", [
 				"as" => "fetch.all.own.propertys",
 				//"middleware" => "init",
 				"uses" => "{$common_landlord_fetch_controller_url}@FetchAllOwnHouseDetailsSummary"
 			]);
 
-			Route::get("fetch/each/own/property/details/", [
+			Route::get("fetch/each/own/property/detail", [
 				"as" => "fetch.each.own.property",
 				//"middleware" => "init",
 				"uses" => "{$common_landlord_fetch_controller_url}@FetchEachHousingDetails"
-			]);	
+			]);
 
 			Route::get("fetch/all/tenants/summary", [
 				"as" => "landlord.fetch.all.tenants",
@@ -485,46 +489,44 @@ Route::prefix("v1/landlord/")->group(function()
 				"uses" => "{$common_landlord_house_tenant_controller_url}@FetchAllTenantsSummary"
 			]);
 
-			Route::get("fetch/each/tenant/details", [
-				"as" => "landlord.fetch.each.tenant.details",
+			Route::get("fetch/each/tenant/detail", [
+				"as" => "landlord.fetch.each.tenant.detail",
 				//"middleware" => "",
 				"uses" => "{$common_landlord_house_tenant_controller_url}@SearchForTenant"
 			]);
-	
+
 			Route::get("fetch/all/tenant/property/requests/summary", [
-				"as" => "landlord.fetch.all.property.requests", 
+				"as" => "landlord.fetch.all.property.requests",
 				//"middleware" => [],
-    			"uses" => "{$common_landlord_fetch_controller_url}@ViewAllPropertyRequestsSummary"
+				"uses" => "{$common_landlord_fetch_controller_url}@ViewAllPropertyRequestsSummary"
 			]);
 
 			Route::get("fetch/each/tenant/property/request/details", [
-				"as" => "landlord.fetch.each.property.request", 
+				"as" => "landlord.fetch.each.property.request",
 				//"middleware" => [],
-    			"uses" => "{$common_landlord_fetch_controller_url}@ViewTenantPropertyRequests"
+				"uses" => "{$common_landlord_fetch_controller_url}@ViewTenantPropertyRequests"
 			]);
 
 			Route::get("fetch/all/landlord/own/invitations/summary", [
-				"as" => "landlord.fetch.all.own.invitations", 
+				"as" => "landlord.fetch.all.own.invitations",
 				//"middleware" => "",
-    			"uses" => "{$common_landlord_fetch_controller_url}@ViewAllOwnPropertyInvitations"
+				"uses" => "{$common_landlord_fetch_controller_url}@ViewAllOwnPropertyInvitations"
 			]);
 
 			Route::get("fetch/each/landlord/own/invitation/detail", [
-				"as" => "landlord.fetch.each.invitation", 
+				"as" => "landlord.fetch.each.invitation",
 				//"middleware" => ,
-    			"uses" => "{$common_landlord_fetch_controller_url}@ViewEachPropertyInvitation"
+				"uses" => "{$common_landlord_fetch_controller_url}@ViewEachPropertyInvitation"
 			]);
-
 		});
 	});
 
 
-	Route::prefix("actions/")->group(function() 
-	{
-		Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:landlord-crud", "LandlordConfirmLoginState", "LandlordConfirmVerifyState"])->group(function()
-		{
+	Route::prefix("actions/")->group(function () {
+		Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:landlord-crud", "LandlordConfirmLoginState", "LandlordConfirmVerifyState"])->group(function () {
 			$common_house_action_controller_url = "App\Http\Controllers\Landlord\LandlordToTenantInteractionsController";
 			//$common_landlord_action_controller_url = "App\Http\Controllers\Landlord\LandlordToLandlordInteractionsController";
+			$common_inspection_schedule_controller_url = "App\Http\Controllers\Landlord\LandlordInspectionAppointmentController";
 
 			//all housefetchs to allow for frontend complex search by the JS dev:
 			Route::post("send/property/invitations", [
@@ -538,18 +540,40 @@ Route::prefix("v1/landlord/")->group(function()
 				//"middleware" => "init",
 				"uses" => "{$common_house_action_controller_url}@DeleteEachPropertyInvite"
 			]);
-			
-			Route::patch("reject/or/approve/property/request/", [
+
+			Route::put("reject/or/approve/property/request", [
 				"as" => "landlord.reject.or.approve.property.request",
 				//"middleware" => "init",
 				"uses" => "{$common_house_action_controller_url}@ApproveRejectTenantRequests"
 			]);
+
+			Route::post("schedule/inspection/appointment/for/landlord/invitation", [
+				"as" => "landlord.schedule.appointment.for.invitation",
+				//"middleware" => "init",
+				"uses" => "{$common_inspection_schedule_controller_url}@ScheduleInspectionAppointmentForLandlordInvitation"
+			]);
+
+			Route::post("schedule/inspection/appointment/for/tenant/request", [
+				"as" => "landlord.schedule.appointment.for.request",
+				//"middleware" => "init",
+				"uses" => "{$common_inspection_schedule_controller_url}@ScheduleInspectionAppointmentForTenantRequest"
+			]);
+
+			Route::get("view/all/inspection/appointment/schedules", [
+				"as" => "landlord.all.inspection.appointments",
+				//"middleware" => "init",
+				"uses" => "{$common_inspection_schedule_controller_url}@ViewAllInspectionAppointmentSchedules"
+			]);
+
+			Route::delete("delete/inspection/appointment/schedule", [
+				"as" => "delete.inspection.appointment",
+				//"middleware" => "init",
+				"uses" => "{$common_inspection_schedule_controller_url}@DeleteInspectionAppointmentSchedule"
+			]);
 		});
 
-		Route::prefix("uploads/")->group(function() 
-		{
-			Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:landlord-crud", "LandlordConfirmLoginState", "LandlordConfirmVerifyState"])->group(function()
-			{
+		Route::prefix("uploads/")->group(function () {
+			Route::prefix("dashboard/")->middleware(["auth:sanctum", "ability:landlord-crud", "LandlordConfirmLoginState", "LandlordConfirmVerifyState"])->group(function () {
 				$common_house_uploads_controller_url = "App\Http\Controllers\Landlord\LandlordHouseUploadDetailsController";
 				$common_house_edits_controller_url = "App\Http\Controllers\Landlord\LandlordHouseEditDetailsController";
 				$common_house_delete_controller_url = "App\Http\Controllers\Landlord\LandlordHouseDeleteDetailsController";
@@ -583,38 +607,34 @@ Route::prefix("v1/landlord/")->group(function()
 					//"middleware" => "init",
 					"uses" => "{$common_house_edits_controller_url}@EditHouseImageDetails"
 				]);
-				
+
 				Route::patch("property/edit/clip/details", [
 					"as" => "landlord.edit.property.clip",
 					//"middleware" => "init",
 					"uses" => "{$common_house_edits_controller_url}@EditHouseClip"
 				]);
 
-				Route::delete("property/delete/all/details", [
-					"as" => "landlord.delete.all.properties",
+				Route::delete("property/delete/all/own/details", [
+					"as" => "landlord.delete.all.own.properties",
 					//"middleware" => "init",
 					"uses" => "{$common_house_delete_controller_url}@DeleteAllPropertyRecords"
 				]);
 
-				Route::delete("property/delete/specific/details", [
-					"as" => "landlord.delete.property",
+				Route::delete("property/delete/specific/own/detail", [
+					"as" => "landlord.delete.specific.own.property",
 					//"middleware" => "init",
 					"uses" => "{$common_house_delete_controller_url}@DeleteSpecificHouseDetails"
 				]);
-
 			});
 		});
-
 	});
 
 
 	//Profile:	
-	Route::prefix("utils/dashboard/")->middleware([ "auth:sanctum", "ability:landlord-crud", "LandlordConfirmLoginState", "LandlordConfirmVerifyState"])->group(function() 
-	{
-		Route::prefix("profile/")->group(function()
-		{
+	Route::prefix("utils/dashboard/")->middleware(["auth:sanctum", "ability:landlord-crud", "LandlordConfirmLoginState", "LandlordConfirmVerifyState"])->group(function () {
+		Route::prefix("profile/")->group(function () {
 			$common_profile_controller_url = "App\Http\Controllers\Landlord\LandlordProfileController";
-			
+
 			//This option will be presented to the already logged in user: 
 			Route::put("authenticated/change/password", [
 				"as" => "landlord.auth.change.password",
@@ -622,20 +642,20 @@ Route::prefix("v1/landlord/")->group(function()
 				"uses" => "{$common_profile_controller_url}@ChangePassword"
 			]);
 
-			Route::put("edit/profile", [
+			Route::put("edit/profile/details", [
 				"as" => "landlord.edit.profile",
 				//"middleware" => "init",
 				"uses" => "{$common_profile_controller_url}@EditProfile"
 			]);
 
 			//optional pictures:
-			Route::put("edit/image", [
+			Route::put("edit/profile/image", [
 				"as" => "landlord.edit.profile.image",
 				//"middleware" => "init",
 				"uses" => "{$common_profile_controller_url}@EditImage"
 			]);
 
-			Route::delete("delete/profile", [
+			Route::delete("delete/all/profile/details", [
 				"as" => "landlord.delete.profile",
 				//"middleware" => "init",
 				"uses" => "{$common_profile_controller_url}@DeleteProfile"
@@ -643,8 +663,7 @@ Route::prefix("v1/landlord/")->group(function()
 		});
 
 
-		Route::prefix("comments_ratings/")->group(function() 
-		{
+		Route::prefix("comments_ratings/")->group(function () {
 			$common_comments_ratings_controller_url = "App\Http\Controllers\Landlord\LandlordSocialCommentsAndRatingsController";
 
 			Route::post("upload/commments/ratings", [
@@ -664,12 +683,10 @@ Route::prefix("v1/landlord/")->group(function()
 				//"middleware" => "init",
 				"uses" => "{$common_comments_ratings_controller_url}@ViewOwnTenantCommentsRatings"
 			]);
-
 		});
-		
 
-		Route::prefix("payments/")->group(function() 
-		{
+
+		Route::prefix("payments/")->group(function () {
 			$common_payment_controller_url = "App\Http\Controllers\Landlord\LandlordPaymentController";
 			$common_payment_execution_controller_url = "App\Http\Controllers\Landlord\LandlordPaymentExecuteController";
 
@@ -677,6 +694,12 @@ Route::prefix("v1/landlord/")->group(function()
 				"as" => "landlord.upload.bank.account.details",
 				//"middleware" => "init",
 				"uses" => "{$common_payment_controller_url}@UploadBankAccountDetails"
+			]);
+
+			Route::post("edit/bank/account/details", [
+				"as" => "landlord.edit.bank.account.details",
+				//"middleware" => "init",
+				"uses" => "{$common_payment_controller_url}@EditBankAccountDetails"
 			]);
 
 			Route::get("fetch/bank/account/details", [
@@ -694,7 +717,7 @@ Route::prefix("v1/landlord/")->group(function()
 			Route::post("view/all/withdrawal/requests/summary", [
 				"as" => "landlord.view.all.withdrawal.requests",
 				//"middleware" => "init",
-				"uses" => "{$common_payment_execution_controller_url}@MakeWithdrawalRequest"
+				"uses" => "{$common_payment_execution_controller_url}@ViewAllWithdrawalRequests"
 			]);
 
 			Route::post("view/each/withdrawal/request", [
@@ -717,10 +740,8 @@ Route::prefix("v1/landlord/")->group(function()
 		});
 
 
-		Route::prefix("social/")->group(function()
-		{
-			Route::prefix("messaging/")->group(function() 
-			{
+		Route::prefix("social/")->group(function () {
+			Route::prefix("messaging/")->group(function () {
 				$common_contact_controller_url = "App\Http\Controllers\Landlord\LandlordSocialContactController";
 
 				Route::post("send/admin/message", [
@@ -752,18 +773,15 @@ Route::prefix("v1/landlord/")->group(function()
 					//"middleware" => "init",
 					"uses" => "{$common_contact_controller_url}@ReadAllSentMessages"
 				]);
-			});		
+			});
 		});
-	});	
-	
+	});
 });
 
 
 //Admin Auth:
-Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "AdminCleanNullRecords"])->group(function()
-{	
-	Route::prefix("auth")->group(function()
-	{
+Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "AdminCleanNullRecords"])->group(function () {
+	Route::prefix("auth")->group(function () {
 		$common_access_controller_url = "App\Http\Controllers\Admin\AdminAccessController";
 
 		Route::post("dashboard/login", [
@@ -771,7 +789,7 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 			"middleware" => "AdminCreateBoss",
 			"uses" => "{$common_access_controller_url}@LoginDashboard"
 		]);
-		
+
 		//here, admin-boss registers admin-hired:
 		Route::post("register/hired", [
 			"as" => "admin.hired.register",
@@ -794,10 +812,8 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 	});
 
 
-	Route::prefix("dashboard/utils/")->group(function()
-	{
-		Route::prefix("profile")->group(function()
-		{
+	Route::prefix("dashboard/utils/")->group(function () {
+		Route::prefix("profile")->group(function () {
 			$common_profile_controller_url = "App\Http\Controllers\Admin\AdminProfileController";
 
 			Route::patch("edit/profile/texts", [
@@ -813,15 +829,14 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 				"uses" => "{$common_profile_controller_url}@EditImage"
 			]);
 		});
-		
-		Route::prefix("searches/")->group(function()
-		{
+
+		Route::prefix("searches/")->group(function () {
 			$common_fetch_controller_url = "App\Http\Controllers\Admin\AdminLandlordTenantFetchController";
 
 			Route::get("fetch/all/landlords/summary", [
 				"as" => "admin.fetch.all.landlords",
 				//"middleware" => "init",
-				"uses" => "{$common_fetch_controller_url}@FetchAllLandlordDetails"//paginate
+				"uses" => "{$common_fetch_controller_url}@FetchAllLandlordDetails" //paginate
 			]);
 
 			Route::patch("fetch/each/landlord/details", [
@@ -833,7 +848,7 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 			Route::get("fetch/all/tenants/summary", [
 				"as" => "admin.fetch.all.tenants",
 				//"middleware" => "init",
-				"uses" => "{$common_fetch_controller_url}@FetchAllTenantDetails"//paginate
+				"uses" => "{$common_fetch_controller_url}@FetchAllTenantDetails" //paginate
 			]);
 
 			Route::patch("fetch/each/tenant/details", [
@@ -841,11 +856,9 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 				//"middleware" => "init",
 				"uses" => "{$common_fetch_controller_url}@FetchEachTenantDetail"
 			]);
-
 		});
 
-		Route::prefix("action/")->group(function()
-		{
+		Route::prefix("action/")->group(function () {
 			$common_admin_action_controller_url = "App\Http\Controllers\Admin\AdminLandlordTenantGeneralActionController";
 
 			Route::patch("ban/landlord", [
@@ -866,7 +879,7 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 				//"middleware" => "init",
 				"uses" => "{$common_admin_action_controller_url}@BanTenant"
 			]);
-	
+
 			Route::delete("delete/tenant", [
 				"as" => "admin.delete.tenant",
 				//"middleware" => "init",
@@ -884,12 +897,9 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 				//"middleware" => "init",
 				"uses" => "{$common_admin_action_controller_url}@ActivateTenant"
 			]);
-
-
 		});
 
-		Route::prefix("payment/")->group(function()
-		{
+		Route::prefix("payment/")->group(function () {
 			$common_admin_payment_controller_url = "App\Http\Controllers\Admin\AdminPaymentController";
 			$common_withdrawal_specific_controller_url = "App\Http\Controllers\Admin\AdminLandlordSpecificActionController";
 
@@ -930,12 +940,10 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 				//"middleware" => "init",
 				"uses" => "{$common_withdrawal_specific_controller_url}@ApproveLandlordWithdrawalRequest"
 			]);
-		}); 
+		});
 
-		Route::prefix("social/")->group(function()
-		{
-			Route::prefix("messaging/")->group(function() 
-			{
+		Route::prefix("social/")->group(function () {
+			Route::prefix("messaging/")->group(function () {
 				$common_contact_controller_url = "App\Http\Controllers\Admin\AdminSocialContactController";
 
 				Route::post("send/landlord/message", [
@@ -967,21 +975,19 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 					//"middleware" => "init",
 					"uses" => "{$common_contact_controller_url}@ReadAllTenantMessages"
 				]);
-
 			});
 
-			Route::prefix("referral/")->group(function() 
-			{
+			Route::prefix("referral/")->group(function () {
 				$common_referral_controller_url = "App\Http\Controllers\Admin\AdminReferralController";
-		
+
 				Route::post("update/referral/details", [
-					"as" => "admin.update.referral.details", 
+					"as" => "admin.update.referral.details",
 					//"middleware" => "init",
 					"uses" => "{$common_referral_controller_url}@UpdateReferralDetails"
 				]);
 
 				Route::get("fetch/referral/details", [
-					"as" => "admin.fetch.referral.details", 
+					"as" => "admin.fetch.referral.details",
 					//"middleware" => "init",
 					"uses" => "{$common_referral_controller_url}@FetchReferralDetails"
 				]);
@@ -994,38 +1000,34 @@ Route::prefix("v1/admin/")->middleware(["auth:sanctum", "ability:admin-boss", "A
 				]);
 			});
 
-			Route::prefix("general/")->group(function() 
-			{
+			Route::prefix("general/")->group(function () {
 				$common_general_controller_url = "App\Http\Controllers\Admin\AdminOverviewController";
 
 				//some of these data will be used for plotting charts on the frontend:
 				//include - month, total payment made:
 				Route::get("fetch/general/statistics", [
-					"as" => "admin.fetch.general.statistics", 
+					"as" => "admin.fetch.general.statistics",
 					//"middleware" => "init",
 					"uses" => "{$common_general_controller_url}@FetchGeneralStatistics"
 				]);
-			
+
 				Route::get("sales/chart/data", [
-					"as" => "admin.sales.chart.data", 
+					"as" => "admin.sales.chart.data",
 					//"middleware" => "init",
 					"uses" => "{$common_general_controller_url}@SpecificLandlordSalesData"
 				]);
 
 				Route::get("view/all/landlords/by/highest/sales", [
-					"as" => "admin.view.landlords.by.highest.sales", 
+					"as" => "admin.view.landlords.by.highest.sales",
 					//"middleware" => "init",
 					"uses" => "{$common_general_controller_url}@ViewLandlordsByHighestSales"
-				]);	
+				]);
 
 				Route::post("hint/landlord/on/each/sales/made", [
-					"as" => "admin.hint.landlord", 
+					"as" => "admin.hint.landlord",
 					"uses" => "{$common_general_controller_url}@HintLandlord"
 				]);
-		
 			});
 		});
 	});
 });
-
-

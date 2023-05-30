@@ -23,25 +23,25 @@ class EventServiceProvider extends ServiceProvider
 
         //Register:
         \App\Events\Tenant\TenantHasRegistered::class => [
-            \App\Listeners\Tenant\EmailTenantAboutVerification::class,
-            \App\Listeners\Tenant\EmailTenantAboutWelcome::class,
+            //\App\Listeners\Tenant\EmailTenantAboutWelcome::class,
+            //\App\Listeners\Tenant\EmailTenantAboutVerification::class,
             //others here...
         ],
 
         \App\Events\Landlord\LandlordHasRegistered::class => [
-            \App\Listeners\Landlord\EmailLandlordAboutVerification::class,
-            \App\Listeners\Landlord\EmailLandlordAboutWelcome::class,
+            //\App\Listeners\Landlord\EmailLandlordAboutWelcome::class,
+            //\App\Listeners\Landlord\EmailLandlordAboutVerification::class,
             //others here...
         ],
 
 
         //Password Reset:
-        \App\Events\Tenant\PassResetLinkWasFormed::class => [
-            \App\Listeners\Tenant\EmailTenantAboutReset::class,
+        \App\Events\Tenant\PassResetTokenWasFormed::class => [
+            //\App\Listeners\Tenant\EmailTenantAboutPassReset::class,
         ],
 
-        \App\Events\Landlord\PassResetLinkWasFormed::class => [
-            \App\Listeners\Landlord\EmailLandlordAboutReset::class,
+        \App\Events\Landlord\PassResetTokenWasFormed::class => [
+            //\App\Listeners\Landlord\EmailLandlordAboutPassReset::class,
         ],
 
     ];

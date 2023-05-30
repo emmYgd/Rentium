@@ -21,9 +21,9 @@ final class TenantConfirmLoginState
         //Before:
         try
         {
-            $logged_in = $this?->TenantConfirmLoginStateService($request);
+            $is_logged_in = $this?->TenantConfirmLoginStateService($request);
 
-            if(!$logged_in)
+            if(!$is_logged_in)
             {
               throw new \Exception("Not logged in yet!");
             }

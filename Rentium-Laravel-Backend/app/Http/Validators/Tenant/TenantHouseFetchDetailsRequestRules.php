@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Validators\Tenant;
+namespace App\Http\Validators\Tenant;
 
 trait TenantHouseFetchDetailsRequestRules 
 {

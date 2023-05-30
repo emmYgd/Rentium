@@ -4,7 +4,7 @@ namespace App\Http\Middleware\Tenant;
 
 use Illuminate\Http\Request;
 
-use App\Services\Traits\ModelAbstractions\General\Tenant\VerifyEmailAbstraction;
+use App\Services\Traits\ModelAbstraction\General\Tenant\VerifyEmailAbstraction;
 
 use Closure;
 
@@ -21,29 +21,20 @@ final class TenantConfirmVerifyState
         //Before:
 
         //check if token has been generated
-        $unique_tenant_id = $request?->tenant_email_or_username;
+
         try
         {
-            if(!$tenant_unique_id)
+            if($request)
             {
-                $tenant_was_verified = $this?->TenantConfirmVerifiedStateService($unique_tenant_id);
+                $tenant_was_verified = $this?->TenantConfirmVerifiedStateService($request);
                 if(!$tenant_was_verified)
                 {
-                    throw new Exception("You are not verified yet! Please enter the 6-digit token sent to your mail to activate your account!");
-                }
-            }
-
-            if(!$tenant_email_or_username)
-            {
-                $tenant_was_verified_using_id = $this?->TenantConfirmVerifiedStateViaId($unique_tenant_id);
-                if(!$tenant_was_verified_using_id)
-                {
-                    throw new Exception("You are not verified yet! Follow the link sent to your mail to activate your account!");
+                    throw new \Exception("You are not verified yet! Please enter the 6-digit token sent to your mail to activate your account!");
                 }
             }
            
         }
-        catch(Exception $ex)
+        catch(\Exception $ex)
         {
             $status = [
                 'code' => 0,

@@ -42,9 +42,6 @@ trait PasswordResetNotificationAbstraction
             // form password reset token:
             $pass_reset_token = $this?->genUniqueNumericId();
 
-            //use event to create and send mailing instance:
-            event(new PassResetTokenWasFormed($request, $pass_reset_token));
-
             //insert this verification token in the database:
             $queryKeysValues = [
                 'landlord_email' => $request->landlord_email,
@@ -67,6 +64,9 @@ trait PasswordResetNotificationAbstraction
             {
                 return false;
             }
+
+            //use event to create and send mailing instance:
+            event(new PassResetTokenWasFormed($request, $pass_reset_token));
 
         //redirect()->intended(RouteServiceProvider::HOME);
         return $unique_landlord_id;

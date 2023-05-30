@@ -1,10 +1,10 @@
 <?php
-namespace App\Services\Interfaces;
+namespace App\Services\Interfaces\Tenant;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
-interface LandlordToTenantInteractionInterface 
+interface TenantToLandlordInteractionsInterface 
 {
     //uploads:
     //search either by username, email address, phone-number or landlord_id

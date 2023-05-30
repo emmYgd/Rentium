@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 
 use App\Services\Interfaces\Tenant\TenantHouseFetchDetailsInterface;
 use App\Services\Traits\ModelAbstraction\Property\TenantHouseFetchDetailsAbstraction;
-use App\Http\Controllers\Validators\Tenant\TenantHouseFetchDetailsRequestRules;
+use App\Http\Validators\Tenant\TenantHouseFetchDetailsRequestRules;
 
 final class TenantHouseFetchDetailsController extends Controller implements TenantHouseFetchDetailsInterface
 {
@@ -24,7 +24,7 @@ final class TenantHouseFetchDetailsController extends Controller implements Tena
 
     //this fetches all the House ids and 1 image of each property
     //query & order by date created, by location, by price,
-    private function FetchAllHousingDetailsByCategory(Request $request): JsonResponse
+    public function FetchAllHousingDetailsByCategory(Request $request): JsonResponse
     {
         $status = array();
 
@@ -69,7 +69,7 @@ final class TenantHouseFetchDetailsController extends Controller implements Tena
     }
 
 
-    private function FetchEachHousingDetails(Request $request): JsonResponse
+    public function FetchEachHousingDetails(Request $request): JsonResponse
     {
       $status = array();
 

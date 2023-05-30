@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Traits\ModelCRUD\TenantRequest;
+namespace App\Services\Traits\ModelCRUD\Request;
 
 use App\Models\TenantRequest;
 

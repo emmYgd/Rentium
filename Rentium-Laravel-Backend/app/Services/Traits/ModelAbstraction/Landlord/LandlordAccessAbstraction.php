@@ -17,70 +17,29 @@ trait LandlordAccessAbstraction
 	use ComputeUniqueIDService;
 	use PassHashVerifyService;
 
-
-	protected function LandlordConfirmLoginStateService(Request $request) : bool
+	protected function LandlordConfirmLoginStateService(Request $request) : bool | null
 	{
-		//init:
-		$queryKeysValues = array();
-		//$foundDetail = null;
-
-		$unique_landlord_id = $request?->unique_landlord_id;
-		$landlord_email = $request?->landlord_email;
-		$landlord_phone_number = $request?->landlord_phone_number;
-
-		$landlord_email_or_phone_number = $request?->landlord_email_or_phone_number;
-
-		if($unique_landlord_id)
-		{
-			$queryKeysValues = [
-				'unique_landlord_id' => $unique_landlord_id,
-			];
-		}
-		
-		if($landlord_email)
-		{
-			$queryKeysValues = [
-				'landlord_email' => $landlord_email,
-			];
-		}
-		
-		if($landlord_phone_number)
-		{
-			$queryKeysValues = [
-				'landlord_phone_number' => $landlord_phone_number,
-			];
-		}
-
-		if($landlord_email_or_phone_number)
-		{
-			$queryKeysValues = [
-				'landlord_email' => $landlord_email_or_phone_number
-			];
-			$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
-			if(!$foundDetail)
-			{
-				$queryKeysValues = [
-					'landlord_phone_number' => $landlord_email_or_phone_number
-				];
-				$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
-				if(!$foundDetail)
-				{
-					return false;
-				}
-			}
-		}
-		
-		$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+		$foundDetail = $this->LandlordFoundDetailService($request);
 		if(!$foundDetail)
 		{
-			return false;
+			throw new \Exception("Cannot find Landlord details");
 		}
-
-		//finally, get the login state:
+		//get the login state:
 		$login_status = $foundDetail?->is_logged_in;
 		return $login_status;
 	}
 
+	protected function LandlordConfirmVerifiedStateService(Request $request) : bool
+	{
+		$foundDetail = $this->LandlordFoundDetailService($request);
+		if(!$foundDetail)
+		{
+			throw new \Exception("Cannot find Landlord details");
+		}
+		//get the login state:
+		$verified_status = $foundDetail?->is_email_verified;
+		return $verified_status;
+	}
 	
 	protected function LandlordLogoutService(Request $request): bool
 	{
@@ -167,15 +126,17 @@ trait LandlordAccessAbstraction
     }
 
 
-	protected function LandlordFoundDetailService(Request $request): Landlord 
+	protected function LandlordFoundDetailService(Request $request): Landlord | bool | null
 	{
 		//init:
+		$queryKeysValues = array();
 		$foundDetail = null;
 
 		$unique_landlord_id = $request?->unique_landlord_id;
 		$landlord_email = $request?->landlord_email;
-		
-		//query KeyValue Pair:
+		$landlord_phone_number = $request?->landlord_phone_number;
+
+		$landlord_email_or_phone_number = $request?->landlord_email_or_phone_number;
 
 		if($unique_landlord_id)
 		{
@@ -183,23 +144,53 @@ trait LandlordAccessAbstraction
 				'unique_landlord_id' => $unique_landlord_id,
 			];
 			$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				return false;
+			}
 		}
-		
+
 		if($landlord_email)
 		{
 			$queryKeysValues = [
-				'landlord_email' => $landlord_email
+				'landlord_email' => $landlord_email,
 			];
 			$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				return false;
+			}
 		}
 
-		if($unique_landlord_id && $landlord_email)
+		if($landlord_phone_number)
 		{
 			$queryKeysValues = [
-				'unique_landlord_id' => $unique_landlord_id,
-				'landlord_email' => $landlord_email
+				'landlord_phone_number' => $landlord_phone_number,
 			];
 			$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				return false;
+			}
+		}
+
+		if($landlord_email_or_phone_number)
+		{
+			$queryKeysValues = [
+				'landlord_email' => $landlord_email_or_phone_number
+			];
+			$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+			if(!$foundDetail)
+			{
+				$queryKeysValues = [
+					'landlord_phone_number' => $landlord_email_or_phone_number
+				];
+				$foundDetail = $this?->LandlordReadSpecificService($queryKeysValues);
+				if(!$foundDetail)
+				{
+					return false;
+				}
+			}
 		}
 
 		return $foundDetail;

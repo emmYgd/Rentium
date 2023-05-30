@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Interfaces;
+namespace App\Services\Interfaces\Tenant;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;

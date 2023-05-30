@@ -37,8 +37,8 @@ trait NewPasswordAbstraction
         $queryKeysValues = [
             'unique_tenant_id' => $unique_tenant_id,
             'tenant_email' => $tenant_email,
-             //production:
-           //'pass_reset_token' => $this->CustomHashPassword(pass_reset_token)
+            //production:
+            //'pass_reset_token' => $this->CustomHashPassword(pass_reset_token)
             //test:
             'pass_reset_token' => $pass_reset_token
         ];

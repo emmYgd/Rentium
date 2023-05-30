@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Traits\ModelCRUD\LandlordInvitation;
+namespace App\Services\Traits\ModelCRUD\Invitation;
 
 use App\Models\LandlordInvitation;
 

@@ -40,7 +40,7 @@ trait TenantCRUD
 	protected function TenantReadSpecificAllService(array $queryKeysValues): array
 	{
 		$readSpecificAllModel = Tenant::where($queryKeysValues)->get();
-		return $readAllModel;
+		return $readSpecificAllModel;
 	}
 
 	protected function TenantReadAllLazyService(): LazyCollection 

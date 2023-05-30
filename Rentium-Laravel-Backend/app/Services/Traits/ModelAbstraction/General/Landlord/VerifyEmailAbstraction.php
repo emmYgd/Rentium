@@ -22,7 +22,7 @@ trait VerifyEmailAbstraction
      * @return \Illuminate\Http\RedirectResponse
      */
     
-     protected function LandlordConfirmVerifiedStateService(Request $request) : bool
+    /*protected function LandlordConfirmVerifiedStateService(Request $request) : bool
      {
          $queryKeysValues = [
              'unique_landlord_id' => $request?->unique_landlord_id
@@ -33,6 +33,7 @@ trait VerifyEmailAbstraction
          $verified_status = $foundDetail?->is_email_verified;
          return $verified_status;
      }
+    */
  
      protected function LandlordChangeVerifiedStateService(Request $request) : bool
      {
